@@ -22,12 +22,12 @@ class NoDLAction:
     def __init__(self,
                  *,
                  name: str,
-                 msg_type: str,
+                 action_type: str,
                  server: bool = False,
                  client: bool = False,
                  qos: QoSProfile = QoSPresetProfiles.ACTION_STATUS_DEFAULT):
         self.name = name
-        self.type = msg_type
+        self.action_type = action_type
         self.server = server
         self.client = client
 
@@ -35,12 +35,13 @@ class NoDLAction:
 
 
 class NoDLParameter:
+    """Data structure for parameter entries in NoDL."""
     def __init__(self,
                  *,
                  name: str,
-                 param_type: str):
+                 parameter_type: str):
         self.name = name
-        self.type = param_type
+        self.parameter_type = parameter_type
 
 
 class NoDLService:
@@ -49,12 +50,12 @@ class NoDLService:
     def __init__(self,
                  *,
                  name: str,
-                 service: str,
+                 service_type: str,
                  server: bool = False,
                  client: bool = False,
                  qos: QoSProfile = QoSPresetProfiles.SERVICES_DEFAULT):
         self.name = name
-        self.type = service
+        self.service_type = service_type
         self.server = server
         self.client = client
 
@@ -67,20 +68,20 @@ class NoDLTopic:
     def __init__(self,
                  *,
                  name: str,
-                 message: str,
-                 server: bool = False,
-                 client: bool = False,
+                 message_type: str,
+                 publisher: bool = False,
+                 subscriber: bool = False,
                  qos: QoSProfile = QoSPresetProfiles.SYSTEM_DEFAULT):
         self.name = name
-        self.type = message
-        self.server = server
-        self.client = client
+        self.message_type = message_type
+        self.publisher = publisher
+        self.subscriber = subscriber
 
         self.qos = qos
 
 
 class NoDLNode:
-    """"""
+    """Data structure containing all interfaces a node exposes."""
 
     def __init__(self, *,
                  name: str,
