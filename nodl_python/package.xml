@@ -5,14 +5,18 @@
   <version>0.0.1</version>
   <description>CLI and parsing utilities for the ROS 2 NoDL</description>
   <maintainer email="ubuntu-robotics@lists.launchpad.net">Ubuntu Robotics</maintainer>
-  <license>LGPLv3</license>
+  <license>GNU Lesser General Public License 3.0</license>
+
+  <depend>rclpy</depend>
 
   <depend>ament_index_python</depend>
+  <depend>python3-lxml</depend>
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
   <test_depend>ament_flake8</test_depend>
   <test_depend>ament_mypy</test_depend>
+  <test_depend>ament_pep257</test_depend>
   <test_depend>python3-pytest</test_depend>
   <test_depend>python3-pytest-mock</test_depend>
 

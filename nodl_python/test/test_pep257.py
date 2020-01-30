@@ -11,13 +11,12 @@
 # If not, see <http://www.gnu.org/licenses/>.
 
 
-from ament_mypy.main import main
+from ament_pep257.main import main
 import pytest
 
 
-@pytest.mark.mypy
 @pytest.mark.linter
-def test_mypy():
-    """Perform mypy static type analysis."""
-    rc = main([])
+@pytest.mark.pep257
+def test_pep257():
+    rc = main(argv=['.'])
     assert rc == 0, 'Found code style errors / warnings'

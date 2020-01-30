@@ -1,13 +1,13 @@
-# Copyright 2020 Canonical, Ltd.
+# Copyright 2020 Canonical Ltd.
 #
 # This program is free software: you can redistribute it and/or modify it under the terms of the
-# GNU Limited General Public License version 3, as published by the Free Software Foundation.
+# GNU General Public License version 3, as published by the Free Software Foundation.
 #
 # This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-# without even the implied warranties of MERCHANTABILITY, SATISFACTORY QUALITY,
-# or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Limited General Public License for more details.
+# without even the implied warranties of MERCHANTABILITY, SATISFACTORY QUALITY, or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more details.
 #
-# You should have received a copy of the GNU Limited General Public License along with this program.
+# You should have received a copy of the GNU General Public License along with this program.
 # If not, see <http://www.gnu.org/licenses/>.
 
 
@@ -19,13 +19,15 @@ from rclpy.qos import QoSPresetProfiles, QoSProfile
 class Action:
     """Data structure for action entries in NoDL."""
 
-    def __init__(self,
-                 *,
-                 name: str,
-                 action_type: str,
-                 server: bool = False,
-                 client: bool = False,
-                 qos: QoSProfile = QoSPresetProfiles.ACTION_STATUS_DEFAULT):
+    def __init__(
+        self,
+        *,
+        name: str,
+        action_type: str,
+        server: bool = False,
+        client: bool = False,
+        qos: QoSProfile = QoSPresetProfiles.ACTION_STATUS_DEFAULT
+    ) -> None:
         self.name = name
         self.action_type = action_type
         self.server = server
@@ -37,10 +39,7 @@ class Action:
 class Parameter:
     """Data structure for parameter entries in NoDL."""
 
-    def __init__(self,
-                 *,
-                 name: str,
-                 parameter_type: str):
+    def __init__(self, *, name: str, parameter_type: str) -> None:
         self.name = name
         self.parameter_type = parameter_type
 
@@ -48,13 +47,15 @@ class Parameter:
 class Service:
     """Data structure for service entries in NoDL."""
 
-    def __init__(self,
-                 *,
-                 name: str,
-                 service_type: str,
-                 server: bool = False,
-                 client: bool = False,
-                 qos: QoSProfile = QoSPresetProfiles.SERVICES_DEFAULT):
+    def __init__(
+        self,
+        *,
+        name: str,
+        service_type: str,
+        server: bool = False,
+        client: bool = False,
+        qos: QoSProfile = QoSPresetProfiles.SERVICES_DEFAULT
+    ) -> None:
         self.name = name
         self.service_type = service_type
         self.server = server
@@ -66,13 +67,15 @@ class Service:
 class Topic:
     """Data structure for topic entries in NoDL."""
 
-    def __init__(self,
-                 *,
-                 name: str,
-                 message_type: str,
-                 publisher: bool = False,
-                 subscriber: bool = False,
-                 qos: QoSProfile = QoSPresetProfiles.SYSTEM_DEFAULT):
+    def __init__(
+        self,
+        *,
+        name: str,
+        message_type: str,
+        publisher: bool = False,
+        subscriber: bool = False,
+        qos: QoSProfile = QoSPresetProfiles.SYSTEM_DEFAULT
+    ) -> None:
         self.name = name
         self.message_type = message_type
         self.publisher = publisher
@@ -84,12 +87,15 @@ class Topic:
 class Node:
     """Data structure containing all interfaces a node exposes."""
 
-    def __init__(self, *,
-                 name: str,
-                 actions: Optional[List[Action]] = None,
-                 parameters: Optional[List[Parameter]] = None,
-                 services: Optional[List[Service]] = None,
-                 topics: Optional[List[Topic]] = None):
+    def __init__(
+        self,
+        *,
+        name: str,
+        actions: Optional[List[Action]] = None,
+        parameters: Optional[List[Parameter]] = None,
+        services: Optional[List[Service]] = None,
+        topics: Optional[List[Topic]] = None
+    ) -> None:
         self.name = name
 
         self.actions = actions if actions else []
