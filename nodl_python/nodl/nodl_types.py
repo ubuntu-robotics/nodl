@@ -13,7 +13,7 @@
 
 from typing import List, Optional
 
-from rclpy.qos import QoSProfile, QoSPresetProfiles
+from rclpy.qos import QoSPresetProfiles, QoSProfile
 
 
 class Action:
@@ -36,6 +36,7 @@ class Action:
 
 class Parameter:
     """Data structure for parameter entries in NoDL."""
+
     def __init__(self,
                  *,
                  name: str,
