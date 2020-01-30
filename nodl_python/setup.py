@@ -29,10 +29,5 @@ setup(
     ],
     description='CLI and parsing utilities for the ROS 2 NoDL',
     license='GNU Limited General Public License v3',
-    #tests_require=['pytest'],
-    #entry_points={
-    #    'console_scripts': [
-    #        'ament_index = ament_index_python.cli:main',
-    #    ],
-    #},
+    tests_require=['pytest']
 )
