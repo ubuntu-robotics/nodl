@@ -16,7 +16,7 @@ from typing import List, Optional
 from rclpy.qos import QoSProfile, QoSPresetProfiles
 
 
-class NoDLAction:
+class Action:
     """Data structure for action entries in NoDL."""
 
     def __init__(self,
@@ -34,7 +34,7 @@ class NoDLAction:
         self.qos = qos
 
 
-class NoDLParameter:
+class Parameter:
     """Data structure for parameter entries in NoDL."""
     def __init__(self,
                  *,
@@ -44,7 +44,7 @@ class NoDLParameter:
         self.parameter_type = parameter_type
 
 
-class NoDLService:
+class Service:
     """Data structure for service entries in NoDL."""
 
     def __init__(self,
@@ -62,7 +62,7 @@ class NoDLService:
         self.qos = qos
 
 
-class NoDLTopic:
+class Topic:
     """Data structure for topic entries in NoDL."""
 
     def __init__(self,
@@ -80,15 +80,15 @@ class NoDLTopic:
         self.qos = qos
 
 
-class NoDLNode:
+class Node:
     """Data structure containing all interfaces a node exposes."""
 
     def __init__(self, *,
                  name: str,
-                 actions: Optional[List[NoDLAction]] = None,
-                 parameters: Optional[List[NoDLParameter]] = None,
-                 services: Optional[List[NoDLService]] = None,
-                 topics: Optional[List[NoDLTopic]] = None):
+                 actions: Optional[List[Action]] = None,
+                 parameters: Optional[List[Parameter]] = None,
+                 services: Optional[List[Service]] = None,
+                 topics: Optional[List[Topic]] = None):
         self.name = name
 
         self.actions = actions if actions else []
