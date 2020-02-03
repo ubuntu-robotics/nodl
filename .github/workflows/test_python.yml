@@ -1,4 +1,4 @@
-name: test nodl_python
+name: test nodl
 
 on:
   pull_request:
