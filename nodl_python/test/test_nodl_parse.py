@@ -37,7 +37,7 @@ def test_parse_element_tree(mocker):
         nodl_parse.parse_element_tree(mock_et)
     assert 'No interface tag in' in str(excinfo.value)
 
-    # Test that succeeds when interface isn"t top level
+    # Test that succeeds when interface isn't top level
     not_interface[0].append(etree.Element('interface'))
     mock_et.getroot.return_value = not_interface
     assert nodl_parse.parse_element_tree(mock_et) is not None
@@ -53,14 +53,14 @@ def test_parse_nodl_file_valid(mocker):
 def test_parse_nodl_file_invalid(mocker):
     mocker.patch('nodl.nodl_parse.etree.parse')
 
-    # Test that unversioned interfaces aren"t accepted
+    # Test that unversioned interfaces aren't accepted
     interface_no_version = etree.Element('interface')
     mocker.patch('nodl.nodl_parse.parse_element_tree', return_value=interface_no_version)
     with pytest.raises(nodl_parse.InvalidNoDLException) as excinfo:
         nodl_parse.parse_nodl_file(Path())
     assert 'Missing version attribute in "interface"' in str(excinfo.value)
 
-    # Test that unsupported versions aren"t accepted
+    # Test that unsupported versions aren't accepted
     interface_future_version = etree.Element(
         'interface', {'version': str(nodl_parse.NODL_MAX_SUPPORTED_VERSION + 1)}
     )

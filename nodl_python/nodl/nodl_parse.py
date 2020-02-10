@@ -118,7 +118,7 @@ def parse_qos(element: Optional[etree._Element]) -> qos.QoSProfile:
                 )
         except KeyError as excinfo:
             raise InvalidNoDLException(
-                f'Couldn"t parse QoS, {excinfo.args[0]} is not a valid policy', element
+                f"Couldn't parse QoS, {excinfo.args[0]} is not a valid policy", element
             ) from excinfo
 
     return profile
@@ -131,8 +131,8 @@ class Interface_v1:
     def parse_action(cls, element: etree._Element) -> Action:
         """Parse a NoDL action from an xml element."""
         # ETree.Element contains a `get()` feature that can be used to avoid
-        # a potential dict creation from accessing `element.attrib`. We don"t use
-        # this because we want a KeyError if the required fields aren"t there.
+        # a potential dict creation from accessing `element.attrib`. We don't use
+        # this because we want a KeyError if the required fields aren't there.
         attribs = element.attrib
         name = attribs['name']
         action_type = attribs['type']
