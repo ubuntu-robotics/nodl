@@ -15,7 +15,7 @@ import warnings
 
 from lxml import etree
 from nodl._parsing._qos import parse_qos
-from nodl._util import str_to_bool
+from nodl._util import get_bool_attribute
 from nodl.exception import InvalidNoDLException
 from nodl.types import Action, Node, Parameter, Service, Topic
 from nodl.warning import NoNodeInterfaceWarning
@@ -30,8 +30,8 @@ def parse_action(element: etree._Element) -> Action:
     name = attribs['name']
     action_type = attribs['type']
 
-    server = str_to_bool(attribs.get('server', 'False'))
-    client = str_to_bool(attribs.get('client', 'False'))
+    server = get_bool_attribute(element, 'server')
+    client = get_bool_attribute(element, 'client')
     if not (server or client):
         warnings.warn(
             f'{element.base}:{element.sourceline}: {name} is neither server or client',
@@ -56,9 +56,8 @@ def parse_service(element: etree._Element) -> Service:
     name = attribs['name']
     service_type = attribs['type']
 
-    server = str_to_bool(attribs.get('server', 'False'))
-    client = str_to_bool(attribs.get('client', 'False'))
-
+    server = get_bool_attribute(element, 'server')
+    client = get_bool_attribute(element, 'client')
     if not (server or client):
         warnings.warn(
             f'{element.base}:{element.sourceline}: {name} is neither server or client',
@@ -78,8 +77,8 @@ def parse_topic(element: etree._Element) -> Topic:
     name = attribs['name']
     message_type = attribs['type']
 
-    publisher = str_to_bool(attribs.get('publisher', 'False'))
-    subscriber = str_to_bool(attribs.get('subscriber', 'False'))
+    publisher = get_bool_attribute(element, 'publisher')
+    subscriber = get_bool_attribute(element, 'subscriber')
     if not (publisher or subscriber):
         warnings.warn(
             f'{element.base}:{element.sourceline}: {name} is neither publisher or subscriber',

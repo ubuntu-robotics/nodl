@@ -29,7 +29,7 @@ def valid_nodl() -> etree._ElementTree:
 
 
 def test_parse_element_tree(mocker):
-    not_interface: etree._Element = etree.Element('notinterface')
+    not_interface = etree.Element('notinterface')
     not_interface.append(etree.Element('stillnotelement'))
     # Test that fails when no interface tag is included
     with pytest.raises(InvalidNoDLException) as excinfo:

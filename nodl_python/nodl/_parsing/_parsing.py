@@ -23,7 +23,7 @@ NODL_MAX_SUPPORTED_VERSION = 1
 
 
 def parse_interface(interface: etree._Element) -> List[Node]:
-    """"""
+    """Parse out all nodes from an interface element."""
     try:
         version = interface.attrib['version']
     except KeyError:
