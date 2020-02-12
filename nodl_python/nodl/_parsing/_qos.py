@@ -13,7 +13,7 @@
 from typing import Optional
 
 from lxml import etree
-from nodl._util import str_to_bool
+from nodl._util import get_bool_attribute
 from nodl.exception import InvalidNoDLException
 from rclpy import qos
 from rclpy.duration import Duration
@@ -50,8 +50,8 @@ def parse_qos(element: Optional[etree._Element]) -> qos.QoSProfile:
                     )
                 )
             if element.get('avoid_ros_namespace_conventions'):
-                profile.avoid_ros_namespace_conventions = str_to_bool(
-                    str(element.get('avoid_ros_namespace_conventions'))
+                profile.avoid_ros_namespace_conventions = get_bool_attribute(
+                    element, 'avoid_ros_namespace_conventions'
                 )
         except KeyError as excinfo:
             raise InvalidNoDLException(

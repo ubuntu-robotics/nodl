@@ -12,7 +12,6 @@
 
 
 from pathlib import Path
-from typing import List
 
 import lxml.etree as etree
 import nodl._parsing
@@ -79,7 +78,7 @@ def test_parse_interface():
 
 def test_parse_qos():
     # Test that there is a default value for all qos entries
-    element: etree._Element = etree.Element('qos')
+    element = etree.Element('qos')
     assert nodl._parsing.parse_qos(element)
 
     # Test that each attribute can be set
@@ -145,7 +144,7 @@ class TestInterface_v1:
     @pytest.mark.filterwarnings('error')
     def test_parse_action(self):
         # Test that parse fails when missing name/type
-        element: etree._Element = etree.Element('service')
+        element = etree.Element('service')
         with pytest.raises(KeyError):
             nodl._parsing._v1.parse_action(element)
 
@@ -167,7 +166,7 @@ class TestInterface_v1:
 
     def test_parse_parameter(self):
         # Test that parse fails when missing name/type
-        element: etree._Element = etree.Element('parameter')
+        element = etree.Element('parameter')
         with pytest.raises(KeyError):
             nodl._parsing._v1.parse_action(element)
 
@@ -179,7 +178,7 @@ class TestInterface_v1:
     @pytest.mark.filterwarnings('error')
     def test_parse_service(self):
         # Test that parse fails when missing name/type
-        element: etree._Element = etree.Element('service')
+        element = etree.Element('service')
         with pytest.raises(KeyError):
             nodl._parsing._v1.parse_service(element)
 
@@ -204,7 +203,7 @@ class TestInterface_v1:
     @pytest.mark.filterwarnings('error')
     def test_parse_topic(self):
         # Test that parse fails when missing name/type
-        element: etree._Element = etree.Element('topic')
+        element = etree.Element('topic')
         with pytest.raises(KeyError):
             nodl._parsing._v1.parse_topic(element)
 
@@ -224,7 +223,7 @@ class TestInterface_v1:
 
     @pytest.mark.filterwarnings('ignore::nodl.warning.NoNodeInterfaceWarning')
     def test_parse_node(self, valid_nodl: etree._ElementTree):
-        nodes: List[etree._Element] = valid_nodl.findall('node')
+        nodes = valid_nodl.findall('node')
         node = nodl._parsing._v1.parse_node(nodes[1])
         assert node.actions and node.parameters and node.services and node.topics
 
