@@ -25,7 +25,7 @@ from rclpy import qos
 
 @pytest.fixture()
 def valid_nodl() -> etree._ElementTree:
-    return etree.parse(str(Path('test') / 'nodl.xml'))
+    return etree.parse(str(Path('test/nodl.xml')))
 
 
 def test_parse_element_tree(mocker):
