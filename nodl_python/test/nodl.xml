@@ -6,7 +6,7 @@
 
   <node name="node_2" >
     <parameter name="rate" type="int" />
-    <topic name="/foo/bar" type="std_msgs/msg/String" subscriber="true">
+    <topic name="/foo/bar" type="std_msgs/msg/String" subscription="true">
       <qos
         history=""
         reliability=""

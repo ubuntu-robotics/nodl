@@ -73,13 +73,13 @@ class Topic:
         name: str,
         message_type: str,
         publisher: bool = False,
-        subscriber: bool = False,
+        subscription: bool = False,
         qos: QoSProfile = QoSPresetProfiles.SYSTEM_DEFAULT
     ) -> None:
         self.name = name
         self.message_type = message_type
         self.publisher = publisher
-        self.subscriber = subscriber
+        self.subscription = subscription
 
         self.qos = qos
 

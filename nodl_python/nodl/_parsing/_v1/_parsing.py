@@ -78,10 +78,10 @@ def parse_topic(element: etree._Element) -> Topic:
     message_type = attribs['type']
 
     publisher = get_bool_attribute(element, 'publisher')
-    subscriber = get_bool_attribute(element, 'subscriber')
-    if not (publisher or subscriber):
+    subscription = get_bool_attribute(element, 'subscription')
+    if not (publisher or subscription):
         warnings.warn(
-            f'{element.base}:{element.sourceline}: {name} is neither publisher or subscriber',
+            f'{element.base}:{element.sourceline}: {name} is neither publisher or subscription',
             NoNodeInterfaceWarning,
         )
 
@@ -91,7 +91,7 @@ def parse_topic(element: etree._Element) -> Topic:
         name=name,
         message_type=message_type,
         publisher=publisher,
-        subscriber=subscriber,
+        subscription=subscription,
         qos=parse_qos(policy),
     )
 
