@@ -10,21 +10,14 @@
 # You should have received a copy of the GNU Limited General Public License along with
 # this program. If not, see <http://www.gnu.org/licenses/>.
 
-from distutils.util import strtobool
+import distutils.util
 from typing import TYPE_CHECKING
 
-from nodl.exception import InvalidNoDLException
-
 if TYPE_CHECKING:  # pragma: no cover
-    from lxml.etree import _Element
+    from lxml import etree
 
 
-def get_bool_attribute(element: '_Element', attribute: str) -> bool:
+def get_bool_attribute(element: 'etree._Element', attribute: str) -> bool:
     """Access attribute and bool conversion."""
     boolean_string = element.get(attribute, 'False')
-    try:
-        return bool(strtobool(boolean_string))
-    except ValueError as excinfo:
-        raise InvalidNoDLException(
-            f'Attribute {attribute} has invalid value {boolean_string}', element
-        ) from excinfo
+    return bool(distutils.util.strtobool(boolean_string))

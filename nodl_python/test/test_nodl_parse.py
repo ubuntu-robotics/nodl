@@ -13,9 +13,10 @@
 
 from pathlib import Path
 
+from lxml.builder import E
 import lxml.etree as etree
 import nodl._parsing
-from nodl.exception import InvalidNoDLException, UnsupportedInterfaceException
+from nodl.exception import InvalidNoDLError, UnsupportedInterfaceError
 import nodl.types
 from nodl.warning import NoNodeInterfaceWarning
 import pytest
@@ -27,53 +28,46 @@ def valid_nodl() -> etree._ElementTree:
     return etree.parse(str(Path('test/nodl.xml')))
 
 
-def test_parse_element_tree(mocker):
-    not_interface = etree.Element('notinterface')
-    not_interface.append(etree.Element('stillnotelement'))
+def test__parse_element_tree(mocker):
+    not_interface = E.notinterface()
     # Test that fails when no interface tag is included
-    with pytest.raises(InvalidNoDLException) as excinfo:
-        nodl._parsing.parse_element_tree(etree.ElementTree(not_interface))
-    assert 'No interface tag in' in str(excinfo.value)
-
-    # Test that succeeds when interface isn't top level
-    not_interface[0].append(etree.Element('interface'))
-    mocker.patch('nodl._parsing._parsing.parse_interface')
-    assert nodl._parsing.parse_element_tree(etree.ElementTree(not_interface)) is not None
+    with pytest.raises(InvalidNoDLError):
+        nodl._parsing._parse_element_tree(etree.ElementTree(not_interface))
 
     # Test that succeeds when interface is top level
-    assert nodl._parsing.parse_element_tree(etree.ElementTree(etree.Element('interface')))
+    interface = E.interface(E.node(), version='1')
+    mocker.patch('nodl._parsing._parsing._parse_interface')
+    assert nodl._parsing._parse_element_tree(etree.ElementTree(interface))
 
 
 def test_parse_nodl_file_valid(mocker):
-    mocker.patch('nodl._parsing._parsing.parse_element_tree')
+    mocker.patch('nodl._parsing._parsing._parse_element_tree')
 
     # Test if accepts a valid xml file
-    assert nodl._parsing.parse_nodl_file(Path('test/nodl.xml')) is not None
+    assert nodl._parsing._parse_nodl_file(Path('test/nodl.xml')) is not None
 
 
-def test_parse_interface():
-
+def test_parse_interface(mocker):
+    mocker.patch('nodl._parsing._parsing.parse_v1._validate_and_parse')
     # Test that unversioned interfaces aren't accepted
-    interface_no_version = etree.Element('interface')
-    with pytest.raises(InvalidNoDLException) as excinfo:
-        nodl._parsing.parse_interface(interface_no_version)
-    assert 'Missing version attribute in "interface"' in str(excinfo.value)
+    interface_no_version = E.interface()
+    with pytest.raises(InvalidNoDLError):
+        nodl._parsing._parse_interface(interface_no_version)
 
     # Test that unsupported versions aren't accepted
-    interface_future_version = etree.Element(
-        'interface', {'version': str(nodl._parsing._parsing.NODL_MAX_SUPPORTED_VERSION + 1)}
+    interface_future_version = E.interface(
+        E.node(), version=str(nodl._parsing._parsing.NODL_MAX_SUPPORTED_VERSION + 1)
     )
-    with pytest.raises(UnsupportedInterfaceException) as excinfo:
-        nodl._parsing.parse_interface(interface_future_version)
-    assert 'Unsupported interface version' in str(excinfo)
+    with pytest.raises(UnsupportedInterfaceError):
+        nodl._parsing._parse_interface(interface_future_version)
 
     # Test that all versions <= max version are supported
     interface_versions = [
-        etree.Element('interface', {'version': str(version)})
+        E.interface(E.node(), version=str(version))
         for version in range(1, nodl._parsing._parsing.NODL_MAX_SUPPORTED_VERSION + 1)
     ]
     for version, interface in enumerate(interface_versions):
-        assert nodl._parsing.parse_interface(interface) is not None, f'Missing version {version}'
+        assert nodl._parsing._parse_interface(interface) is not None, f'Missing version {version}'
 
 
 def test_parse_qos():
@@ -134,7 +128,7 @@ def test_parse_qos():
 
     # Test that parser errors on out of enum values
     element.set('liveliness', 'foobar')
-    with pytest.raises(InvalidNoDLException):
+    with pytest.raises(InvalidNoDLError):
         nodl._parsing.parse_qos(element)
 
 
@@ -142,18 +136,11 @@ class TestInterface_v1:
     """Test suite for v1 of NoDL."""
 
     @pytest.mark.filterwarnings('error')
-    def test_parse_action(self):
-        # Test that parse fails when missing name/type
-        element = etree.Element('service')
-        with pytest.raises(KeyError):
-            nodl._parsing._v1.parse_action(element)
-
-        element.set('name', 'foo')
-        element.set('type', 'bar')
-        element.set('server', 'True')
+    def test__parse_action(self):
+        element = E.action(name='foo', type='bar', server='true')
 
         # Test that actions get parsed
-        action = nodl._parsing._v1.parse_action(element)
+        action = nodl._parsing._v1._parse_action(element)
         assert type(action) is nodl.types.Action
         assert action.server
         # Test that bools have default values
@@ -162,32 +149,25 @@ class TestInterface_v1:
         # Test that warning is emitted when both bools are false
         element.attrib['server'] = 'False'
         with pytest.warns(NoNodeInterfaceWarning):
-            assert type(nodl._parsing._v1.parse_action(element)) is nodl.types.Action
+            assert type(nodl._parsing._v1._parse_action(element)) is nodl.types.Action
 
-    def test_parse_parameter(self):
-        # Test that parse fails when missing name/type
-        element = etree.Element('parameter')
-        with pytest.raises(KeyError):
-            nodl._parsing._v1.parse_action(element)
+    def test__parse_parameter(self):
+        element = E.parameter()
 
         # Test that parse is successful
         element.set('name', 'foo')
         element.set('type', 'bar')
-        assert type(nodl._parsing._v1.parse_parameter(element)) is nodl.types.Parameter
+        assert type(nodl._parsing._v1._parse_parameter(element)) is nodl.types.Parameter
+        assert element.get('name') == 'foo'
+        assert element.get('type') == 'bar'
 
     @pytest.mark.filterwarnings('error')
-    def test_parse_service(self):
+    def test__parse_service(self):
         # Test that parse fails when missing name/type
-        element = etree.Element('service')
-        with pytest.raises(KeyError):
-            nodl._parsing._v1.parse_service(element)
+        element = E.service(name='foo', type='bar', server='true')
 
-        element.set('name', 'foo')
-        element.set('type', 'bar')
-        element.set('server', 'True')
-
-        # Test that actions get parsed
-        service = nodl._parsing._v1.parse_service(element)
+        # Test that services get parsed
+        service = nodl._parsing._v1._parse_service(element)
         assert type(service) is nodl.types.Service
         assert service.server
         # Test that bools have default values
@@ -196,46 +176,33 @@ class TestInterface_v1:
         # Test that warning is emitted when both bools are false
         element.attrib['server'] = 'False'
         with pytest.warns(NoNodeInterfaceWarning):
-            service = nodl._parsing._v1.parse_service(element)
+            service = nodl._parsing._v1._parse_service(element)
 
         assert not service.server
 
     @pytest.mark.filterwarnings('error')
-    def test_parse_topic(self):
+    def test__parse_topic(self):
         # Test that parse fails when missing name/type
-        element = etree.Element('topic')
-        with pytest.raises(KeyError):
-            nodl._parsing._v1.parse_topic(element)
+        element = E.topic(name='foo', type='bar', publisher='true')
 
-        element.set('name', 'foo')
-        element.set('type', 'bar')
-        element.set('publisher', 'True')
-        topic = nodl._parsing._v1.parse_topic(element)
+        topic = nodl._parsing._v1._parse_topic(element)
         assert topic.publisher
         # Test that bools have default values
-        assert not topic.subscriber
+        assert not topic.subscription
 
         # Test that warning is emitted when both bools are false
-        element.set('publisher', 'False')
+        element.set('publisher', 'false')
         with pytest.warns(NoNodeInterfaceWarning):
-            topic = nodl._parsing._v1.parse_topic(element)
+            topic = nodl._parsing._v1._parse_topic(element)
         assert not topic.publisher
 
     @pytest.mark.filterwarnings('ignore::nodl.warning.NoNodeInterfaceWarning')
-    def test_parse_node(self, valid_nodl: etree._ElementTree):
+    def test__parse_node(self, valid_nodl: etree._ElementTree):
         nodes = valid_nodl.findall('node')
-        node = nodl._parsing._v1.parse_node(nodes[1])
+        node = nodl._parsing._v1._parse_node(nodes[1])
         assert node.actions and node.parameters and node.services and node.topics
 
-        nodes[0].find('topic').attrib.pop('name')
-        with pytest.raises(InvalidNoDLException):
-            nodl._parsing._v1.parse_node(nodes[0])
-
     @pytest.mark.filterwarnings('ignore::nodl.warning.NoNodeInterfaceWarning')
-    def test_parse_nodes(self, valid_nodl: etree._ElementTree):
-        nodes = nodl._parsing._v1.parse_nodes(valid_nodl.getroot())
+    def test__parse_nodes(self, valid_nodl: etree._ElementTree):
+        nodes = nodl._parsing._v1._parse_nodes(valid_nodl.getroot())
         assert len(nodes) == 2
-        next(valid_nodl.iter('parameter')).attrib.pop('name')
-        with pytest.raises(InvalidNoDLException) as excinfo:
-            nodl._parsing._v1.parse_nodes(valid_nodl.getroot())
-        assert 'parameter is missing required attribute "name"' in excinfo.value.args[0]

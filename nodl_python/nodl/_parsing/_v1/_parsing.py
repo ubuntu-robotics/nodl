@@ -15,20 +15,20 @@ import warnings
 
 from lxml import etree
 from nodl._parsing._qos import parse_qos
+from nodl._parsing._schemas import get_schema
 from nodl._util import get_bool_attribute
-from nodl.exception import InvalidNoDLException
+from nodl.exception import InvalidNoDLError
 from nodl.types import Action, Node, Parameter, Service, Topic
 from nodl.warning import NoNodeInterfaceWarning
 
 
-def parse_action(element: etree._Element) -> Action:
+_SCHEMA = get_schema('v1.xsd')
+
+
+def _parse_action(element: etree._Element) -> Action:
     """Parse a NoDL action from an xml element."""
-    # ETree.Element contains a `get()` feature that can be used to avoid
-    # a potential dict creation from accessing `element.attrib`. We don't use
-    # this because we want a KeyError if the required fields aren't there.
-    attribs = element.attrib
-    name = attribs['name']
-    action_type = attribs['type']
+    name = element.get('name')
+    action_type = element.get('type')
 
     server = get_bool_attribute(element, 'server')
     client = get_bool_attribute(element, 'client')
@@ -38,23 +38,20 @@ def parse_action(element: etree._Element) -> Action:
             NoNodeInterfaceWarning,
         )
 
-    policy = element.find('qos')
+    policy = parse_qos(element.find('qos'))
 
-    return Action(
-        name=name, action_type=action_type, server=server, client=client, qos=parse_qos(policy)
-    )
+    return Action(name=name, action_type=action_type, server=server, client=client, qos=policy)
 
 
-def parse_parameter(element: etree._Element) -> Parameter:
+def _parse_parameter(element: etree._Element) -> Parameter:
     """Parse a NoDL parameter from an xml element."""
-    return Parameter(name=element.attrib['name'], parameter_type=element.attrib['type'])
+    return Parameter(name=element.get('name'), parameter_type=element.get('type'))
 
 
-def parse_service(element: etree._Element) -> Service:
+def _parse_service(element: etree._Element) -> Service:
     """Parse a NoDL service from an xml element."""
-    attribs = element.attrib
-    name = attribs['name']
-    service_type = attribs['type']
+    name = element.get('name')
+    service_type = element.get('type')
 
     server = get_bool_attribute(element, 'server')
     client = get_bool_attribute(element, 'client')
@@ -64,18 +61,15 @@ def parse_service(element: etree._Element) -> Service:
             NoNodeInterfaceWarning,
         )
 
-    policy = element.find('qos')
+    policy = parse_qos(element.find('qos'))
 
-    return Service(
-        name=name, service_type=service_type, server=server, client=client, qos=parse_qos(policy),
-    )
+    return Service(name=name, service_type=service_type, server=server, client=client, qos=policy,)
 
 
-def parse_topic(element: etree._Element) -> Topic:
+def _parse_topic(element: etree._Element) -> Topic:
     """Parse a NoDL topic from an xml element."""
-    attribs = element.attrib
-    name = attribs['name']
-    message_type = attribs['type']
+    name = element.get('name')
+    message_type = element.get('type')
 
     publisher = get_bool_attribute(element, 'publisher')
     subscription = get_bool_attribute(element, 'subscription')
@@ -85,24 +79,24 @@ def parse_topic(element: etree._Element) -> Topic:
             NoNodeInterfaceWarning,
         )
 
-    policy = element.find('qos')
+    policy = parse_qos(element.find('qos'))
 
     return Topic(
         name=name,
         message_type=message_type,
         publisher=publisher,
         subscription=subscription,
-        qos=parse_qos(policy),
+        qos=policy
     )
 
 
-def parse_nodes(interface) -> List[Node]:
+def _parse_nodes(interface: etree._Element) -> List[Node]:
     """Parse the nodes contained in an interface element and return a list."""
     node_elements = [child for child in interface if child.tag == 'node']
-    return [parse_node(node) for node in node_elements]
+    return [_parse_node(node) for node in node_elements]
 
 
-def parse_node(node: etree._Element) -> Node:
+def _parse_node(node: etree._Element) -> Node:
     """Parse a NoDL node and all the elements it contains from an xml element."""
     name = node.attrib['name']
 
@@ -112,20 +106,23 @@ def parse_node(node: etree._Element) -> Node:
     topics = []
 
     for child in node:
-        try:
-            if child.tag == 'action':
-                actions.append(parse_action(child))
-            if child.tag == 'parameter':
-                parameters.append(parse_parameter(child))
-            if child.tag == 'service':
-                services.append(parse_service(child))
-            if child.tag == 'topic':
-                topics.append(parse_topic(child))
-        except KeyError as excinfo:
-            raise InvalidNoDLException(
-                f'{child.tag} is missing required attribute "{excinfo.args[0]}"', child
-            ) from excinfo
-
+        if child.tag == 'action':
+            actions.append(_parse_action(child))
+        if child.tag == 'parameter':
+            parameters.append(_parse_parameter(child))
+        if child.tag == 'service':
+            services.append(_parse_service(child))
+        if child.tag == 'topic':
+            topics.append(_parse_topic(child))
     return Node(
         name=name, actions=actions, parameters=parameters, services=services, topics=topics
     )
+
+
+def _validate_and_parse(interface: etree._Element) -> List[Node]:
+    """"""
+    try:
+        _SCHEMA.assertValid(interface)
+    except etree.DocumentInvalid as e:
+        raise InvalidNoDLError(e.error_log[0].message, e) from e
+    return _parse_nodes(interface)

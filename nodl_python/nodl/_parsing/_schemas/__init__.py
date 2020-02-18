@@ -10,12 +10,14 @@
 # You should have received a copy of the GNU Limited General Public License along with
 # this program. If not, see <http://www.gnu.org/licenses/>.
 
+from pathlib import Path
+
 from lxml import etree
-from nodl._util import get_bool_attribute
+import pkg_resources
 
 
-def test_get_bool_attribute_except(mocker):
-    foo = etree.Element('foo', {'bar': 'true'})
-    assert get_bool_attribute(foo, 'bar')
-    foo.set('bar', 'false')
-    assert not get_bool_attribute(foo, 'bar')
+def get_schema(name: str) -> etree.XMLSchema:
+    file_name = pkg_resources.resource_filename(
+        package_or_requirement='nodl', resource_name=str(Path(f'schemas/{name}'))
+    )
+    return etree.XMLSchema(file=file_name)

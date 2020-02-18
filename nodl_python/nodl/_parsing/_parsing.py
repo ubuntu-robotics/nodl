@@ -10,45 +10,48 @@
 # You should have received a copy of the GNU Limited General Public License along with
 # this program. If not, see <http://www.gnu.org/licenses/>.
 
-from pathlib import Path
-from typing import List
+from typing import List, TYPE_CHECKING
 
 from lxml import etree
 from nodl._parsing import _v1 as parse_v1
-from nodl.exception import InvalidNoDLException, UnsupportedInterfaceException
+from nodl._parsing._schemas import get_schema
+from nodl.exception import InvalidNoDLError, UnsupportedInterfaceError
 from nodl.types import Node
+
+if TYPE_CHECKING:
+    import pathlib
 
 
 NODL_MAX_SUPPORTED_VERSION = 1
 
 
-def parse_interface(interface: etree._Element) -> List[Node]:
+_SCHEMA = get_schema('interface.xsd')
+
+
+def _parse_interface(interface: etree._Element) -> List[Node]:
     """Parse out all nodes from an interface element."""
-    try:
-        version = interface.attrib['version']
-    except KeyError:
-        raise InvalidNoDLException(f'Missing version attribute in "interface".', interface)
-
-    if version == '1':
-        return parse_v1.parse_nodes(interface)
+    if interface.get('version') == '1':
+        return parse_v1._validate_and_parse(interface)
     else:
-        raise UnsupportedInterfaceException(NODL_MAX_SUPPORTED_VERSION, interface)
+        raise UnsupportedInterfaceError(interface.get('version'), NODL_MAX_SUPPORTED_VERSION)
 
 
-def parse_element_tree(element_tree: etree._ElementTree) -> List[Node]:
+def _parse_element_tree(element_tree: etree._ElementTree) -> List[Node]:
     """Extract an interface element from an ElementTree if present."""
-    interface = element_tree.getroot()
-    if interface.tag != 'interface':
-        interface = next(interface.iter('interface'), None)
-        if interface is None:
-            raise InvalidNoDLException(f'No interface tag in {element_tree.docinfo.URL}')
-    return parse_interface(interface)
+    try:
+        _SCHEMA.assertValid(element_tree)
+    except etree.DocumentInvalid as e:
+        if e.error_log[0].type == etree.ErrorTypes.SCHEMAV_CVC_ELT_1:
+            raise InvalidNoDLError(
+                f'Failed to parse root interface element: {e}', e
+            ) from e
+        raise InvalidNoDLError('Document Invalid', e)
+    return _parse_interface(element_tree.getroot())
 
 
-def parse_nodl_file(path: Path) -> List[Node]:
+def _parse_nodl_file(path: 'pathlib.Path') -> List[Node]:
     """Parse the nodes out of a given NoDL file."""
     full_path = path.resolve()
     element_tree = etree.parse(str(full_path))
-    interface = parse_element_tree(element_tree)
 
-    return parse_element_tree(interface)
+    return _parse_element_tree(element_tree)

@@ -11,10 +11,11 @@
 # this program. If not, see <http://www.gnu.org/licenses/>.
 
 from ._parsing import (  # noqa: F401
-    parse_action,
-    parse_node,
-    parse_nodes,
-    parse_parameter,
-    parse_service,
-    parse_topic,
+    _parse_action,
+    _parse_node,
+    _parse_nodes,
+    _parse_parameter,
+    _parse_service,
+    _parse_topic,
+    _validate_and_parse
 )

@@ -15,28 +15,38 @@ from typing import Optional
 from lxml import etree
 
 
-class NoDLException(Exception):
+class NoDLError(Exception):
     """Base class for all NoDL exceptions."""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
 
-class InvalidNoDLException(NoDLException):
+class InvalidNoDLError(NoDLError):
     """Exception class representing most errors in parsing the NoDL tree."""
 
-    def __init__(self, message: str, element: Optional[etree._Element] = None) -> None:
-        if element is not None:
-            super().__init__(f'{element.base}:{element.sourceline}  ' + message)
+    def __init__(self, message: str, invalid: Optional[etree.DocumentInvalid] = None) -> None:
+        self.invalid = invalid
+        if invalid is not None:
+            e = invalid.error_log[0]
+            super().__init__(
+                f'Error parsing NoDL from {e.filename}, line {e.line}, col {e.column} {message}'
+            )
         else:
             super().__init__(message)
 
 
-class UnsupportedInterfaceException(InvalidNoDLException):
+class InvalidQoSError(InvalidNoDLError):
+    """Exception class for value out of enum in QoS."""
+
+    def __init__(self, message: str, element: etree._Element) -> None:
+        super().__init__(
+            f'Error parsing NoDL from {element.base}, line {element.sourceline} {message}'
+        )
+
+
+class UnsupportedInterfaceError(InvalidNoDLError):
     """Exception thrown when an interface has a future or invalid version."""
 
-    def __init__(self, max_version: int, element: etree._Element) -> None:
-        super().__init__(
-            f'{element.base}:{element.sourceline}  Unsupported interface version: '
-            f'{element.attrib["version"]} (must be <={max_version})'
-        )
+    def __init__(self, version: int, max_version: int) -> None:
+        super().__init__('Unsupported interface version: {version} must be <= {max_version}')

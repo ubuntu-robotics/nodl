@@ -14,7 +14,7 @@ from typing import Optional
 
 from lxml import etree
 from nodl._util import get_bool_attribute
-from nodl.exception import InvalidNoDLException
+from nodl.exception import InvalidQoSError
 from rclpy import qos
 from rclpy.duration import Duration
 
@@ -54,7 +54,7 @@ def parse_qos(element: Optional[etree._Element]) -> qos.QoSProfile:
                     element, 'avoid_ros_namespace_conventions'
                 )
         except KeyError as excinfo:
-            raise InvalidNoDLException(
+            raise InvalidQoSError(
                 f"Couldn't parse QoS, {excinfo.args[0]} is not a valid policy", element
             ) from excinfo
 

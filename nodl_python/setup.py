@@ -1,3 +1,5 @@
+from pathlib import Path
+
 from setuptools import find_packages, setup
 
 package_name = 'nodl_python'
@@ -28,5 +30,8 @@ setup(
     ],
     description='CLI and parsing utilities for the ROS 2 NoDL',
     license='GNU Limited General Public License v3',
-    tests_require=['pytest']
+    tests_require=['pytest'],
+    package_data={
+        'nodl': [str(child) for child in Path('nodl/schemas').iterdir() if child.is_file()]
+    }
 )

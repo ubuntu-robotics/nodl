@@ -10,5 +10,5 @@
 # You should have received a copy of the GNU Limited General Public License along with
 # this program. If not, see <http://www.gnu.org/licenses/>.
 
-from ._parsing import parse_element_tree, parse_interface, parse_nodl_file  # noqa: F401
+from ._parsing import _parse_element_tree, _parse_interface, _parse_nodl_file  # noqa: F401
 from ._qos import parse_qos  # noqa: F401
