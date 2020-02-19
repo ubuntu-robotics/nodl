@@ -34,6 +34,10 @@ def test__parse_element_tree(mocker):
     with pytest.raises(InvalidNoDLError):
         nodl._parsing._parse_element_tree(etree.ElementTree(not_interface))
 
+    # Test that fails when no version is specified
+    with pytest.raises(InvalidNoDLError):
+        nodl._parsing._parse_element_tree(E.interface(E.node()))
+
     # Test that succeeds when interface is top level
     interface = E.interface(E.node(), version='1')
     mocker.patch('nodl._parsing._parsing._parse_interface')
@@ -134,6 +138,19 @@ def test_parse_qos():
 
 class TestInterface_v1:
     """Test suite for v1 of NoDL."""
+
+    def test__validate_and_parse(self, valid_nodl):
+        # Assert a minimal example passes validation
+        element = E.interface(E.node(E.action(name='bar', type='baz'), name='foo'), version='1')
+        assert nodl._parsing._v1._validate_and_parse(element)
+
+        # Assert example nodl passes validation
+        assert nodl._parsing._v1._validate_and_parse(valid_nodl.getroot())
+
+        # Assert empty interface does not pass
+        element = E.interface(version='1')
+        with pytest.raises(InvalidNoDLError):
+            nodl._parsing._v1._validate_and_parse(element)
 
     @pytest.mark.filterwarnings('error')
     def test__parse_action(self):

@@ -18,7 +18,7 @@ from nodl._parsing._schemas import get_schema
 from nodl.exception import InvalidNoDLError, UnsupportedInterfaceError
 from nodl.types import Node
 
-if TYPE_CHECKING:
+if TYPE_CHECKING:  # pragma: no cover
     import pathlib
 
 
