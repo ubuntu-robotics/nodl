@@ -16,9 +16,8 @@ from pathlib import Path
 from lxml.builder import E
 import lxml.etree as etree
 import nodl._parsing
-from nodl.exception import InvalidNoDLError, UnsupportedInterfaceError
+from nodl.exception import InvalidNoDLError, NoNodeInterfaceError, UnsupportedInterfaceError
 import nodl.types
-from nodl.warning import NoNodeInterfaceWarning
 import pytest
 from rclpy import qos
 
@@ -141,7 +140,7 @@ class TestInterface_v1:
 
     def test__validate_and_parse(self, valid_nodl):
         # Assert a minimal example passes validation
-        element = E.interface(E.node(E.action(name='bar', type='baz'), name='foo'), version='1')
+        element = E.interface(E.node(E.action(name='bar', type='baz', server='true'), name='foo'), version='1')
         assert nodl._parsing._v1._validate_and_parse(element)
 
         # Assert example nodl passes validation
@@ -152,7 +151,6 @@ class TestInterface_v1:
         with pytest.raises(InvalidNoDLError):
             nodl._parsing._v1._validate_and_parse(element)
 
-    @pytest.mark.filterwarnings('error')
     def test__parse_action(self):
         element = E.action(name='foo', type='bar', server='true')
 
@@ -165,8 +163,8 @@ class TestInterface_v1:
 
         # Test that warning is emitted when both bools are false
         element.attrib['server'] = 'False'
-        with pytest.warns(NoNodeInterfaceWarning):
-            assert type(nodl._parsing._v1._parse_action(element)) is nodl.types.Action
+        with pytest.raises(NoNodeInterfaceError):
+            nodl._parsing._v1._parse_action(element)
 
     def test__parse_parameter(self):
         element = E.parameter()
@@ -178,7 +176,6 @@ class TestInterface_v1:
         assert element.get('name') == 'foo'
         assert element.get('type') == 'bar'
 
-    @pytest.mark.filterwarnings('error')
     def test__parse_service(self):
         # Test that parse fails when missing name/type
         element = E.service(name='foo', type='bar', server='true')
@@ -192,12 +189,9 @@ class TestInterface_v1:
 
         # Test that warning is emitted when both bools are false
         element.attrib['server'] = 'False'
-        with pytest.warns(NoNodeInterfaceWarning):
-            service = nodl._parsing._v1._parse_service(element)
+        with pytest.raises(NoNodeInterfaceError):
+            nodl._parsing._v1._parse_service(element)
 
-        assert not service.server
-
-    @pytest.mark.filterwarnings('error')
     def test__parse_topic(self):
         # Test that parse fails when missing name/type
         element = E.topic(name='foo', type='bar', publisher='true')
@@ -209,17 +203,14 @@ class TestInterface_v1:
 
         # Test that warning is emitted when both bools are false
         element.set('publisher', 'false')
-        with pytest.warns(NoNodeInterfaceWarning):
-            topic = nodl._parsing._v1._parse_topic(element)
-        assert not topic.publisher
+        with pytest.raises(NoNodeInterfaceError):
+            nodl._parsing._v1._parse_topic(element)
 
-    @pytest.mark.filterwarnings('ignore::nodl.warning.NoNodeInterfaceWarning')
     def test__parse_node(self, valid_nodl: etree._ElementTree):
         nodes = valid_nodl.findall('node')
         node = nodl._parsing._v1._parse_node(nodes[1])
         assert node.actions and node.parameters and node.services and node.topics
 
-    @pytest.mark.filterwarnings('ignore::nodl.warning.NoNodeInterfaceWarning')
     def test__parse_nodes(self, valid_nodl: etree._ElementTree):
         nodes = nodl._parsing._v1._parse_nodes(valid_nodl.getroot())
         assert len(nodes) == 2

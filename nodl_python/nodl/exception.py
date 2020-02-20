@@ -45,6 +45,15 @@ class InvalidQoSError(InvalidNoDLError):
         )
 
 
+class NoNodeInterfaceError(NoDLError):
+    """Error raised when not marked as either server/client or pub/sub."""
+
+    def __init__(self, message: str, element: etree._Element) -> None:
+        super().__init__(
+            f'Error parsing nodl from {element.base}, line {element.sourceline} {message}'
+        )
+
+
 class UnsupportedInterfaceError(InvalidNoDLError):
     """Exception thrown when an interface has a future or invalid version."""
 

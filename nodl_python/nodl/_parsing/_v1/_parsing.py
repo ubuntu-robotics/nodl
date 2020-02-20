@@ -11,15 +11,13 @@
 # this program. If not, see <http://www.gnu.org/licenses/>.
 
 from typing import List
-import warnings
 
 from lxml import etree
 from nodl._parsing._qos import parse_qos
 from nodl._parsing._schemas import get_schema
 from nodl._util import get_bool_attribute
-from nodl.exception import InvalidNoDLError
+from nodl.exception import InvalidNoDLError, NoNodeInterfaceError
 from nodl.types import Action, Node, Parameter, Service, Topic
-from nodl.warning import NoNodeInterfaceWarning
 
 
 _SCHEMA = get_schema('v1.xsd')
@@ -33,10 +31,7 @@ def _parse_action(element: etree._Element) -> Action:
     server = get_bool_attribute(element, 'server')
     client = get_bool_attribute(element, 'client')
     if not (server or client):
-        warnings.warn(
-            f'{element.base}:{element.sourceline}: {name} is neither server or client',
-            NoNodeInterfaceWarning,
-        )
+        raise NoNodeInterfaceError(f'Action <{name}> is neither server nor client.', element)
 
     policy = parse_qos(element.find('qos'))
 
@@ -56,10 +51,7 @@ def _parse_service(element: etree._Element) -> Service:
     server = get_bool_attribute(element, 'server')
     client = get_bool_attribute(element, 'client')
     if not (server or client):
-        warnings.warn(
-            f'{element.base}:{element.sourceline}: {name} is neither server or client',
-            NoNodeInterfaceWarning,
-        )
+        raise NoNodeInterfaceError(f'Service <{name}> is neither server nor client.', element)
 
     policy = parse_qos(element.find('qos'))
 
@@ -74,9 +66,8 @@ def _parse_topic(element: etree._Element) -> Topic:
     publisher = get_bool_attribute(element, 'publisher')
     subscription = get_bool_attribute(element, 'subscription')
     if not (publisher or subscription):
-        warnings.warn(
-            f'{element.base}:{element.sourceline}: {name} is neither publisher or subscription',
-            NoNodeInterfaceWarning,
+        raise NoNodeInterfaceError(
+            f'Topic <{name}> is neither publisher nor subscription.', element
         )
 
     policy = parse_qos(element.find('qos'))
@@ -86,7 +77,7 @@ def _parse_topic(element: etree._Element) -> Topic:
         message_type=message_type,
         publisher=publisher,
         subscription=subscription,
-        qos=policy
+        qos=policy,
     )
 
 
