@@ -13,7 +13,7 @@
 from typing import List
 
 from lxml import etree
-from nodl._parsing._qos import parse_qos
+from nodl._parsing._qos import _parse_qos
 from nodl._parsing._schemas import get_schema
 from nodl._util import get_bool_attribute
 from nodl.exception import InvalidNoDLError, NoNodeInterfaceError
@@ -33,7 +33,7 @@ def _parse_action(element: etree._Element) -> Action:
     if not (server or client):
         raise NoNodeInterfaceError(f'Action <{name}> is neither server nor client.', element)
 
-    policy = parse_qos(element.find('qos'))
+    policy = _parse_qos(element.find('qos'))
 
     return Action(name=name, action_type=action_type, server=server, client=client, qos=policy)
 
@@ -53,7 +53,7 @@ def _parse_service(element: etree._Element) -> Service:
     if not (server or client):
         raise NoNodeInterfaceError(f'Service <{name}> is neither server nor client.', element)
 
-    policy = parse_qos(element.find('qos'))
+    policy = _parse_qos(element.find('qos'))
 
     return Service(name=name, service_type=service_type, server=server, client=client, qos=policy,)
 
@@ -70,7 +70,7 @@ def _parse_topic(element: etree._Element) -> Topic:
             f'Topic <{name}> is neither publisher nor subscription.', element
         )
 
-    policy = parse_qos(element.find('qos'))
+    policy = _parse_qos(element.find('qos'))
 
     return Topic(
         name=name,

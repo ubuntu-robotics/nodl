@@ -19,7 +19,7 @@ from rclpy import qos
 from rclpy.duration import Duration
 
 
-def parse_qos(element: Optional[etree._Element]) -> qos.QoSProfile:
+def _parse_qos(element: Optional[etree._Element]) -> qos.QoSProfile:
     """Populate a QoS Profile from a qos NoDL element."""
     profile: qos.QoSProfile = qos.QoSProfile(
         **qos.QoSProfile._QoSProfile__qos_profile_default_dict

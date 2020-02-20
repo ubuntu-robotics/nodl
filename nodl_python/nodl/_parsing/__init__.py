@@ -11,4 +11,4 @@
 # this program. If not, see <http://www.gnu.org/licenses/>.
 
 from ._parsing import _parse_element_tree, _parse_interface, _parse_nodl_file  # noqa: F401
-from ._qos import parse_qos  # noqa: F401
+from ._qos import _parse_qos  # noqa: F401
