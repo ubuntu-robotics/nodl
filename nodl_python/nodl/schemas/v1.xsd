@@ -3,20 +3,21 @@
 
     <xs:element name="qos">
         <xs:complexType>
-            <xs:attribute name="history"/>
-            <xs:attribute name="reliability"/>
-            <xs:attribute name="durability"/>
-            <xs:attribute name="deadline"/>
-            <xs:attribute name="lifespan"/>
-            <xs:attribute name="liveliness"/>
-            <xs:attribute name="liveliness_lease_duration"/>
-            <xs:attribute name="avoid_ros_namespace_conventions"/>
+            <xs:attribute name="history" type="xs:string"/>
+            <xs:attribute name="reliability" type="xs:string"/>
+            <xs:attribute name="durability" type="xs:string"/>
+            <xs:attribute name="depth" type="xs:integer"/>
+            <xs:attribute name="lifespan" type="xs:decimal"/>
+            <xs:attribute name="deadline" type="xs:decimal"/>
+            <xs:attribute name="liveliness" type="xs:string"/>
+            <xs:attribute name="liveliness_lease_duration" type="xs:decimal"/>
+            <xs:attribute name="avoid_ros_namespace_conventions" type="xs:boolean"/>
         </xs:complexType>
     </xs:element>
 
     <xs:element name="action">
         <xs:complexType>
-            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:sequence>
                 <xs:element ref="qos"/>
             </xs:sequence>
             <xs:attribute name="name" type="xs:string" use="required"/>
@@ -35,7 +36,7 @@
 
     <xs:element name="service">
         <xs:complexType>
-            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:sequence>
                 <xs:element ref="qos"/>
             </xs:sequence>
             <xs:attribute name="name" type="xs:string" use="required"/>
@@ -47,7 +48,7 @@
 
     <xs:element name="topic">
         <xs:complexType>
-            <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:sequence>
                 <xs:element ref="qos"/>
             </xs:sequence>
             <xs:attribute name="name" type="xs:string" use="required"/>

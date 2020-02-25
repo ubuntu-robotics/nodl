@@ -13,49 +13,68 @@
 from typing import Optional
 
 from lxml import etree
+from nodl import errors
 from nodl._util import get_bool_attribute
-from nodl.exception import InvalidQoSError
 from rclpy import qos
 from rclpy.duration import Duration
 
 
 def _parse_qos(element: Optional[etree._Element]) -> qos.QoSProfile:
     """Populate a QoS Profile from a qos NoDL element."""
-    profile: qos.QoSProfile = qos.QoSProfile(
-        **qos.QoSProfile._QoSProfile__qos_profile_default_dict
-    )
+    kwargs = {}
 
     if element is not None:
-        try:
-            if element.get('history'):
-                profile.history = qos.HistoryPolicy.get_from_short_key(element.get('history'))
-            if element.get('reliability'):
-                profile.reliability = qos.ReliabilityPolicy.get_from_short_key(
+
+        if element.get('history'):
+            try:
+                kwargs['history'] = qos.HistoryPolicy.get_from_short_key(element.get('history'))
+            except KeyError:
+                raise errors.InvalidQOSAttributeValueError('history', element)
+
+        if element.get('reliability'):
+            try:
+                kwargs['reliability'] = qos.ReliabilityPolicy.get_from_short_key(
                     element.get('reliability')
                 )
-            if element.get('durability'):
-                profile.durability = qos.DurabilityPolicy.get_from_short_key(
-                    element.get('durability')
+            except KeyError:
+                raise errors.InvalidQOSAttributeValueError('reliability', element)
+
+        if element.get('durability'):
+            try:
+                kwargs['durability'] = qos.DurabilityPolicy.get_from_short_key(
+                    element.get('durability', element)
                 )
-            if element.get('lifespan'):
-                profile.lifespan = Duration(nanoseconds=float(element.get('lifespan')))
-            if element.get('liveliness'):
-                profile.liveliness = qos.LivelinessPolicy.get_from_short_key(
+            except KeyError:
+                raise errors.InvalidQOSAttributeValueError('durability', element)
+
+        if element.get('depth'):
+            kwargs['depth'] = int(element.get('depth'))
+
+        if element.get('lifespan'):
+            kwargs['lifespan'] = Duration(nanoseconds=float(element.get('lifespan')))
+
+        if element.get('deadline'):
+            kwargs['deadline'] = Duration(nanoseconds=float(element.get('lifespan')))
+
+        if element.get('liveliness'):
+            try:
+                kwargs['liveliness'] = qos.LivelinessPolicy.get_from_short_key(
                     element.get('liveliness')
                 )
-            if element.get('liveliness_lease_duration'):
-                profile.liveliness_lease_duration = Duration(
-                    nanoseconds=float(
-                        element.get('liveliness_lease_duration', profile.liveliness_lease_duration)
-                    )
-                )
-            if element.get('avoid_ros_namespace_conventions'):
-                profile.avoid_ros_namespace_conventions = get_bool_attribute(
-                    element, 'avoid_ros_namespace_conventions'
-                )
-        except KeyError as excinfo:
-            raise InvalidQoSError(
-                f"Couldn't parse QoS, {excinfo.args[0]} is not a valid policy", element
-            ) from excinfo
+            except KeyError:
+                raise errors.InvalidQOSAttributeValueError('liveliness', element)
 
-    return profile
+        if element.get('liveliness_lease_duration'):
+            kwargs['liveliness_lease_duration'] = Duration(
+                nanoseconds=float(
+                    element.get('liveliness_lease_duration')
+                )
+            )
+        if element.get('avoid_ros_namespace_conventions'):
+            kwargs['avoid_ros_namespace_conventions'] = get_bool_attribute(
+                element, 'avoid_ros_namespace_conventions'
+            )
+    try:
+        return qos.QoSProfile(**kwargs)
+    except qos.InvalidQoSProfileException as e:
+        raise errors.InvalidQoSError(str(e), element)

@@ -10,22 +10,17 @@
 # You should have received a copy of the GNU Limited General Public License along with
 # this program. If not, see <http://www.gnu.org/licenses/>.
 
-from typing import List, TYPE_CHECKING
+from pathlib import Path
+from typing import IO, List, Union
 
 from lxml import etree
 from nodl._parsing import _v1 as parse_v1
-from nodl._parsing._schemas import get_schema
-from nodl.exception import InvalidNoDLError, UnsupportedInterfaceError
+from nodl._parsing._schemas import interface_schema
+from nodl.errors import InvalidNoDLError, UnsupportedInterfaceError
 from nodl.types import Node
-
-if TYPE_CHECKING:  # pragma: no cover
-    import pathlib
 
 
 NODL_MAX_SUPPORTED_VERSION = 1
-
-
-_SCHEMA = get_schema('interface.xsd')
 
 
 def _parse_interface(interface: etree._Element) -> List[Node]:
@@ -39,7 +34,7 @@ def _parse_interface(interface: etree._Element) -> List[Node]:
 def _parse_element_tree(element_tree: etree._ElementTree) -> List[Node]:
     """Extract an interface element from an ElementTree if present."""
     try:
-        _SCHEMA.assertValid(element_tree)
+        interface_schema().assertValid(element_tree)
     except etree.DocumentInvalid as e:
         if e.error_log[0].type == etree.ErrorTypes.SCHEMAV_CVC_ELT_1:
             raise InvalidNoDLError(
@@ -49,9 +44,12 @@ def _parse_element_tree(element_tree: etree._ElementTree) -> List[Node]:
     return _parse_interface(element_tree.getroot())
 
 
-def _parse_nodl_file(path: 'pathlib.Path') -> List[Node]:
+def _parse_nodl_file(path: Union[str, Path, IO]) -> List[Node]:
     """Parse the nodes out of a given NoDL file."""
-    full_path = path.resolve()
-    element_tree = etree.parse(str(full_path))
+    if isinstance(path, str):
+        path = Path(path)
+    if isinstance(path, Path):
+        path = str(path.resolve())
+    element_tree = etree.parse(path)
 
     return _parse_element_tree(element_tree)

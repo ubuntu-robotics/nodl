@@ -13,14 +13,11 @@
 from typing import List
 
 from lxml import etree
+from nodl import errors
 from nodl._parsing._qos import _parse_qos
-from nodl._parsing._schemas import get_schema
+from nodl._parsing._schemas import v1_schema
 from nodl._util import get_bool_attribute
-from nodl.exception import InvalidNoDLError, NoNodeInterfaceError
 from nodl.types import Action, Node, Parameter, Service, Topic
-
-
-_SCHEMA = get_schema('v1.xsd')
 
 
 def _parse_action(element: etree._Element) -> Action:
@@ -31,7 +28,7 @@ def _parse_action(element: etree._Element) -> Action:
     server = get_bool_attribute(element, 'server')
     client = get_bool_attribute(element, 'client')
     if not (server or client):
-        raise NoNodeInterfaceError(f'Action <{name}> is neither server nor client.', element)
+        raise errors.AmbiguousActionInterfaceError(element)
 
     policy = _parse_qos(element.find('qos'))
 
@@ -51,7 +48,7 @@ def _parse_service(element: etree._Element) -> Service:
     server = get_bool_attribute(element, 'server')
     client = get_bool_attribute(element, 'client')
     if not (server or client):
-        raise NoNodeInterfaceError(f'Service <{name}> is neither server nor client.', element)
+        raise errors.AmbiguousServiceInterfaceError(element)
 
     policy = _parse_qos(element.find('qos'))
 
@@ -66,9 +63,7 @@ def _parse_topic(element: etree._Element) -> Topic:
     publisher = get_bool_attribute(element, 'publisher')
     subscription = get_bool_attribute(element, 'subscription')
     if not (publisher or subscription):
-        raise NoNodeInterfaceError(
-            f'Topic <{name}> is neither publisher nor subscription.', element
-        )
+        raise errors.AmbiguousTopicInterfaceError(element)
 
     policy = _parse_qos(element.find('qos'))
 
@@ -113,7 +108,7 @@ def _parse_node(node: etree._Element) -> Node:
 def _validate_and_parse(interface: etree._Element) -> List[Node]:
     """"""
     try:
-        _SCHEMA.assertValid(interface)
+        v1_schema().assertValid(interface)
     except etree.DocumentInvalid as e:
-        raise InvalidNoDLError(e.error_log[0].message, e) from e
+        raise errors.InvalidNoDLError(e.error_log[0].message, e) from e
     return _parse_nodes(interface)

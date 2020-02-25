@@ -16,7 +16,25 @@ from lxml import etree
 import pkg_resources
 
 
-def get_schema(name: str) -> etree.XMLSchema:
+__interface_schema: etree.XMLSchema = None
+__v1_schema: etree.XMLSchema = None
+
+
+def interface_schema() -> etree.XMLSchema:
+    global __interface_schema
+    if not __interface_schema:
+        __interface_schema = _get_schema('interface.xsd')
+    return __interface_schema
+
+
+def v1_schema() -> etree.XMLSchema:
+    global __v1_schema
+    if not __v1_schema:
+        __v1_schema = _get_schema('v1.xsd')
+    return __v1_schema
+
+
+def _get_schema(name: str) -> etree.XMLSchema:
     file_name = pkg_resources.resource_filename(
         package_or_requirement='nodl', resource_name=str(Path(f'schemas/{name}'))
     )
