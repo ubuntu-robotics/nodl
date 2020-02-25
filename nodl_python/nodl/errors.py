@@ -57,7 +57,7 @@ class InvalidQOSAttributeValueError(InvalidQoSError):
 class InvalidActionError(InvalidNoDLError):
     """"""
 
-    def __init__(self, message: str, element: etree._Element = None) -> None:
+    def __init__(self, message: str, element: etree._Element) -> None:
         super().__init__(
             f'Error parsing action from {element.base}, line {element.sourceline}: {message}'
         )
@@ -66,7 +66,7 @@ class InvalidActionError(InvalidNoDLError):
 class AmbiguousActionInterfaceError(InvalidActionError):
     """"""
 
-    def __init__(self, element: etree._Element = None) -> None:
+    def __init__(self, element: etree._Element) -> None:
         super().__init__(
             f'Action <{element.get("name")}> is neither server nor client', element=element
         )
@@ -75,7 +75,7 @@ class AmbiguousActionInterfaceError(InvalidActionError):
 class InvalidParameterError(InvalidNoDLError):
     """"""
 
-    def __init__(self, message: str, element: etree._Element = None) -> None:
+    def __init__(self, message: str, element: etree._Element) -> None:
         super().__init__(
             f'Error parsing parameter from {element.base}, line {element.sourceline}: {message}'
         )
@@ -84,7 +84,7 @@ class InvalidParameterError(InvalidNoDLError):
 class InvalidTopicError(InvalidNoDLError):
     """"""
 
-    def __init__(self, message: str, element: etree._Element = None) -> None:
+    def __init__(self, message: str, element: etree._Element) -> None:
         super().__init__(
             f'Error parsing topic from {element.base}, line {element.sourceline}: {message}'
         )
@@ -93,7 +93,7 @@ class InvalidTopicError(InvalidNoDLError):
 class AmbiguousTopicInterfaceError(InvalidTopicError):
     """"""
 
-    def __init__(self, element: etree._Element = None) -> None:
+    def __init__(self, element: etree._Element) -> None:
         super().__init__(
             f'Topic <{element.get("name")}> is neither publisher nor subscription', element=element
         )
@@ -102,7 +102,7 @@ class AmbiguousTopicInterfaceError(InvalidTopicError):
 class InvalidServiceError(InvalidNoDLError):
     """"""
 
-    def __init__(self, message: str, element: etree._Element = None) -> None:
+    def __init__(self, message: str, element: etree._Element) -> None:
         super().__init__(
             f'Error parsing service from {element.base}, line {element.sourceline}: {message}'
         )
@@ -111,7 +111,7 @@ class InvalidServiceError(InvalidNoDLError):
 class AmbiguousServiceInterfaceError(InvalidServiceError):
     """"""
 
-    def __init__(self, element: etree._Element = None) -> None:
+    def __init__(self, element: etree._Element) -> None:
         super().__init__(
             f'Service <{element.get("name")}> is neither server nor client', element=element
         )
