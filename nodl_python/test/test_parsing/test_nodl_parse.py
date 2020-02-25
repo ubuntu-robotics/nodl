@@ -22,11 +22,6 @@ import pytest
 from rclpy import qos
 
 
-@pytest.fixture()
-def valid_nodl() -> etree._ElementTree:
-    return etree.parse(str(Path('test/nodl.xml')))
-
-
 def test__parse_element_tree(mocker):
     not_interface = E.notinterface()
     # Test that fails when no interface tag is included
@@ -48,6 +43,13 @@ def test_parse_nodl_file_valid(mocker):
 
     # Test if accepts a valid xml file
     assert nodl._parsing._parsing._parse_nodl_file(Path('test/nodl.xml')) is not None
+
+    # Test if accepts file name as string
+    assert nodl._parsing._parsing._parse_nodl_file('test/nodl.xml') is not None
+
+    # Test if accepts file object
+    with open('test/nodl.xml', 'rb') as fd:
+        assert nodl._parsing._parsing._parse_nodl_file(fd) is not None
 
 
 def test_parse_interface(mocker):
@@ -136,87 +138,3 @@ def test__parse_qos():
     element.set('liveliness', 'foobar')
     with pytest.raises(errors.InvalidQoSError):
         nodl._parsing._qos._parse_qos(element)
-
-
-class TestInterface_v1:
-    """Test suite for v1 of NoDL."""
-
-    def test__validate_and_parse(self, valid_nodl):
-        # Assert a minimal example passes validation
-        element = E.interface(
-            E.node(E.action(E.qos(depth='10'), name='bar', type='baz', server='true'), name='foo'),
-            version='1',
-        )
-        assert nodl._parsing._v1._validate_and_parse(element)
-
-        # Assert example nodl passes validation
-        assert nodl._parsing._v1._validate_and_parse(valid_nodl.getroot())
-
-        # Assert empty interface does not pass
-        element = E.interface(version='1')
-        with pytest.raises(errors.InvalidNoDLError):
-            nodl._parsing._v1._validate_and_parse(element)
-
-    def test__parse_action(self):
-        element = E.action(E.qos(depth='10'), name='foo', type='bar', server='true')
-
-        # Test that actions get parsed
-        action = nodl._parsing._v1._parse_action(element)
-        assert type(action) is nodl.types.Action
-        assert action.server
-        # Test that bools have default values
-        assert not action.client
-
-        # Test that warning is emitted when both bools are false
-        element.attrib['server'] = 'False'
-        with pytest.raises(errors.AmbiguousActionInterfaceError):
-            nodl._parsing._v1._parse_action(element)
-
-    def test__parse_parameter(self):
-        element = E.parameter()
-
-        # Test that parse is successful
-        element.set('name', 'foo')
-        element.set('type', 'bar')
-        assert type(nodl._parsing._v1._parse_parameter(element)) is nodl.types.Parameter
-        assert element.get('name') == 'foo'
-        assert element.get('type') == 'bar'
-
-    def test__parse_service(self):
-        # Test that parse fails when missing name/type
-        element = E.service(E.qos(depth='10'), name='foo', type='bar', server='true')
-
-        # Test that services get parsed
-        service = nodl._parsing._v1._parse_service(element)
-        assert type(service) is nodl.types.Service
-        assert service.server
-        # Test that bools have default values
-        assert not service.client
-
-        # Test that warning is emitted when both bools are false
-        element.attrib['server'] = 'False'
-        with pytest.raises(errors.AmbiguousServiceInterfaceError):
-            nodl._parsing._v1._parse_service(element)
-
-    def test__parse_topic(self):
-        # Test that parse fails when missing name/type
-        element = E.topic(E.qos(depth='10'), name='foo', type='bar', publisher='true')
-
-        topic = nodl._parsing._v1._parse_topic(element)
-        assert topic.publisher
-        # Test that bools have default values
-        assert not topic.subscription
-
-        # Test that warning is emitted when both bools are false
-        element.set('publisher', 'false')
-        with pytest.raises(errors.AmbiguousTopicInterfaceError):
-            nodl._parsing._v1._parse_topic(element)
-
-    def test__parse_node(self, valid_nodl: etree._ElementTree):
-        nodes = valid_nodl.findall('node')
-        node = nodl._parsing._v1._parse_node(nodes[1])
-        assert node.actions and node.parameters and node.services and node.topics
-
-    def test__parse_nodes(self, valid_nodl: etree._ElementTree):
-        nodes = nodl._parsing._v1._parse_nodes(valid_nodl.getroot())
-        assert len(nodes) == 2
