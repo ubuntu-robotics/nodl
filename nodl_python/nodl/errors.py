@@ -21,17 +21,13 @@ if TYPE_CHECKING:  # pragma: no cover
 class NoDLError(Exception):
     """Base class for all NoDL exceptions."""
 
-    pass
-
 
 class InvalidNoDLError(NoDLError):
     """Exception class representing most errors in parsing the NoDL tree."""
 
-    pass
-
 
 class InvalidNoDLDocumentError(InvalidNoDLError):
-    """"""
+    """Error raised when schema validation fails."""
 
     def __init__(self, invalid: etree.DocumentInvalid) -> None:
         self.invalid = invalid
@@ -42,7 +38,7 @@ class InvalidNoDLDocumentError(InvalidNoDLError):
 
 
 class InvalidElementError(InvalidNoDLError):
-    """"""
+    """Base class for all bad NoDL elements."""
 
     def __init__(self, message: str, element: etree._Element) -> None:
         super().__init__(
@@ -52,13 +48,11 @@ class InvalidElementError(InvalidNoDLError):
 
 
 class InvalidQoSError(InvalidElementError):
-    """Exception class for value out of enum in QoS."""
-
-    pass
+    """Base class for all errors in parsing a QoS element."""
 
 
 class InvalidQosProfileError(InvalidQoSError):
-    """"""
+    """Error raised when rclpy does not accept QoSProfile constructor arguments."""
 
     def __init__(
         self, error: 'rclpy.qos.InvalidQoSProfileException', element: etree._Element
@@ -67,7 +61,7 @@ class InvalidQosProfileError(InvalidQoSError):
 
 
 class InvalidQOSAttributeValueError(InvalidQoSError):
-    """Exception class for value out of enum in QoS."""
+    """Error raised for values out of enum in QoS."""
 
     def __init__(self, attribute: str, element: etree._Element) -> None:
         super().__init__(
@@ -76,13 +70,11 @@ class InvalidQOSAttributeValueError(InvalidQoSError):
 
 
 class InvalidActionError(InvalidElementError):
-    """"""
-
-    pass
+    """Base class for all errors in parsing an action."""
 
 
 class AmbiguousActionInterfaceError(InvalidActionError):
-    """"""
+    """Error raised when an action has no interface exposed."""
 
     def __init__(self, element: etree._Element) -> None:
         super().__init__(
@@ -91,19 +83,15 @@ class AmbiguousActionInterfaceError(InvalidActionError):
 
 
 class InvalidParameterError(InvalidElementError):
-    """"""
-
-    pass
+    """Base class for all errors in parsing a parameter."""
 
 
 class InvalidTopicError(InvalidElementError):
-    """"""
-
-    pass
+    """Base class for all errors in parsing a topic."""
 
 
 class AmbiguousTopicInterfaceError(InvalidTopicError):
-    """"""
+    """Error raised when a topic has no interface exposed."""
 
     def __init__(self, element: etree._Element) -> None:
         super().__init__(
@@ -112,13 +100,11 @@ class AmbiguousTopicInterfaceError(InvalidTopicError):
 
 
 class InvalidServiceError(InvalidElementError):
-    """"""
-
-    pass
+    """Base class for all errors in parsing a service."""
 
 
 class AmbiguousServiceInterfaceError(InvalidServiceError):
-    """"""
+    """Error raised when a topic has no interface exposed."""
 
     def __init__(self, element: etree._Element) -> None:
         super().__init__(
@@ -127,7 +113,7 @@ class AmbiguousServiceInterfaceError(InvalidServiceError):
 
 
 class UnsupportedInterfaceError(InvalidNoDLError):
-    """Exception thrown when an interface has a future or invalid version."""
+    """Error raised when an interface has a future or invalid version."""
 
     def __init__(self, version: int, max_version: int) -> None:
         super().__init__(f'Unsupported interface version: {version} must be <= {max_version}')
