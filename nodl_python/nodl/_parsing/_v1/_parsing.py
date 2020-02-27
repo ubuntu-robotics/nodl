@@ -14,8 +14,8 @@ from typing import List
 
 from lxml import etree
 from nodl import errors
-from nodl._parsing._qos import _parse_qos
 from nodl._parsing._schemas import v1_schema
+from nodl._parsing._v1._qos import _parse_qos
 from nodl._util import get_bool_attribute
 from nodl.types import Action, Node, Parameter, Service, Topic
 
