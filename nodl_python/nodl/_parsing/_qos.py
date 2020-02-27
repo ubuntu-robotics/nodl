@@ -73,4 +73,4 @@ def _parse_qos(element: etree._Element) -> qos.QoSProfile:
     try:
         return qos.QoSProfile(**kwargs)
     except qos.InvalidQoSProfileException as e:
-        raise errors.InvalidQoSError(str(e), element) from e
+        raise errors.InvalidQosProfileError(e, element) from e

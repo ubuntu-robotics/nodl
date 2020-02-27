@@ -105,10 +105,10 @@ def _parse_node(node: etree._Element) -> Node:
     )
 
 
-def _validate_and_parse(interface: etree._Element) -> List[Node]:
+def parse(interface: etree._Element) -> List[Node]:
     """"""
     try:
         v1_schema().assertValid(interface)
     except etree.DocumentInvalid as e:
-        raise errors.InvalidNoDLError(e.error_log[0].message, e) from e
+        raise errors.InvalidNoDLDocumentError(e) from e
     return _parse_nodes(interface)

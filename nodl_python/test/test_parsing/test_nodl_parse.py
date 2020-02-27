@@ -19,17 +19,16 @@ from nodl import errors
 import nodl._parsing
 import nodl.types
 import pytest
-from rclpy import qos
 
 
 def test__parse_element_tree(mocker):
     not_interface = E.notinterface()
     # Test that fails when no interface tag is included
-    with pytest.raises(errors.InvalidNoDLError):
+    with pytest.raises(errors.InvalidNoDLDocumentError):
         nodl._parsing._parsing._parse_element_tree(etree.ElementTree(not_interface))
 
     # Test that fails when no version is specified
-    with pytest.raises(errors.InvalidNoDLError):
+    with pytest.raises(errors.InvalidNoDLDocumentError):
         nodl._parsing._parsing._parse_element_tree(E.interface(E.node()))
 
     # Test that succeeds when interface is top level
@@ -42,22 +41,18 @@ def test_parse_nodl_file_valid(mocker):
     mocker.patch('nodl._parsing._parsing._parse_element_tree')
 
     # Test if accepts a valid xml file
-    assert nodl._parsing._parsing._parse_nodl_file(Path('test/nodl.xml')) is not None
+    assert nodl._parsing._parsing.parse(Path('test/nodl.xml')) is not None
 
     # Test if accepts file name as string
-    assert nodl._parsing._parsing._parse_nodl_file('test/nodl.xml') is not None
+    assert nodl._parsing._parsing.parse('test/nodl.xml') is not None
 
     # Test if accepts file object
     with open('test/nodl.xml', 'rb') as fd:
-        assert nodl._parsing._parsing._parse_nodl_file(fd) is not None
+        assert nodl._parsing._parsing.parse(fd) is not None
 
 
 def test_parse_interface(mocker):
-    mocker.patch('nodl._parsing._parsing.parse_v1._validate_and_parse')
-    # Test that unversioned interfaces aren't accepted
-    interface_no_version = E.interface()
-    with pytest.raises(errors.InvalidNoDLError):
-        nodl._parsing._parsing._parse_interface(interface_no_version)
+    mocker.patch('nodl._parsing._parsing.parse_v1.parse')
 
     # Test that unsupported versions aren't accepted
     interface_future_version = E.interface(
@@ -75,66 +70,3 @@ def test_parse_interface(mocker):
         assert (
             nodl._parsing._parsing._parse_interface(interface) is not None
         ), f'Missing version {version}'
-
-
-def test__parse_qos():
-    # Test that qos requires at minimum history or depth
-    element = etree.Element('qos')
-    with pytest.raises(errors.InvalidQoSError):
-        nodl._parsing._qos._parse_qos(element)
-
-    # Test that each attribute can be set
-    # History
-    element.set('history', 'system_default')
-    qos_profile = nodl._parsing._qos._parse_qos(element)
-    assert qos_profile.history == qos.HistoryPolicy.SYSTEM_DEFAULT
-    element.set('history', 'keep_all')
-    qos_profile = nodl._parsing._qos._parse_qos(element)
-    assert qos_profile.history == qos.HistoryPolicy.KEEP_ALL
-
-    # Reliability
-    element.set('reliability', 'system_default')
-    qos_profile = nodl._parsing._qos._parse_qos(element)
-    assert qos_profile.reliability == qos.ReliabilityPolicy.SYSTEM_DEFAULT
-    element.set('reliability', 'best_effort')
-    qos_profile = nodl._parsing._qos._parse_qos(element)
-    assert qos_profile.reliability == qos.ReliabilityPolicy.BEST_EFFORT
-
-    # Durability
-    element.set('durability', 'system_default')
-    qos_profile = nodl._parsing._qos._parse_qos(element)
-    assert qos_profile.durability == qos.DurabilityPolicy.SYSTEM_DEFAULT
-    element.set('durability', 'transient_local')
-    qos_profile = nodl._parsing._qos._parse_qos(element)
-    assert qos_profile.durability == qos.DurabilityPolicy.TRANSIENT_LOCAL
-
-    # Lifespan
-    element.set('lifespan', '451')
-    qos_profile = nodl._parsing._qos._parse_qos(element)
-    assert qos_profile.lifespan.nanoseconds == 451
-
-    # Liveliness
-    element.set('liveliness', 'system_default')
-    qos_profile = nodl._parsing._qos._parse_qos(element)
-    assert qos_profile.liveliness == qos.LivelinessPolicy.SYSTEM_DEFAULT
-    element.set('liveliness', 'manual_by_node')
-    qos_profile = nodl._parsing._qos._parse_qos(element)
-    assert qos_profile.liveliness == qos.LivelinessPolicy.MANUAL_BY_NODE
-
-    # Liveliness Lease Duration
-    element.set('liveliness_lease_duration', '451')
-    qos_profile = nodl._parsing._qos._parse_qos(element)
-    assert qos_profile.liveliness_lease_duration.nanoseconds == 451
-
-    # Avoid ROS namespace conventions
-    element.set('avoid_ros_namespace_conventions', 'True')
-    qos_profile = nodl._parsing._qos._parse_qos(element)
-    assert qos_profile.avoid_ros_namespace_conventions
-    element.set('avoid_ros_namespace_conventions', 'False')
-    qos_profile = nodl._parsing._qos._parse_qos(element)
-    assert not qos_profile.avoid_ros_namespace_conventions
-
-    # Test that parser errors on out of enum values
-    element.set('liveliness', 'foobar')
-    with pytest.raises(errors.InvalidQoSError):
-        nodl._parsing._qos._parse_qos(element)

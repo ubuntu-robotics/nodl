@@ -14,9 +14,9 @@ from pathlib import Path
 from typing import IO, List, Union
 
 from lxml import etree
+from nodl import errors
 from nodl._parsing import _v1 as parse_v1
 from nodl._parsing._schemas import interface_schema
-from nodl.errors import InvalidNoDLError, UnsupportedInterfaceError
 from nodl.types import Node
 
 
@@ -26,9 +26,11 @@ NODL_MAX_SUPPORTED_VERSION = 1
 def _parse_interface(interface: etree._Element) -> List[Node]:
     """Parse out all nodes from an interface element."""
     if interface.get('version') == '1':
-        return parse_v1._validate_and_parse(interface)
+        return parse_v1.parse(interface)
     else:
-        raise UnsupportedInterfaceError(interface.get('version'), NODL_MAX_SUPPORTED_VERSION)
+        raise errors.UnsupportedInterfaceError(
+            interface.get('version'), NODL_MAX_SUPPORTED_VERSION
+        )
 
 
 def _parse_element_tree(element_tree: etree._ElementTree) -> List[Node]:
@@ -36,15 +38,11 @@ def _parse_element_tree(element_tree: etree._ElementTree) -> List[Node]:
     try:
         interface_schema().assertValid(element_tree)
     except etree.DocumentInvalid as e:
-        if e.error_log[0].type == etree.ErrorTypes.SCHEMAV_CVC_ELT_1:
-            raise InvalidNoDLError(
-                f'Failed to parse root interface element: {e}', e
-            ) from e
-        raise InvalidNoDLError('Document Invalid', e)
+        raise errors.InvalidNoDLDocumentError(e)
     return _parse_interface(element_tree.getroot())
 
 
-def _parse_nodl_file(path: Union[str, Path, IO]) -> List[Node]:
+def parse(path: Union[str, Path, IO]) -> List[Node]:
     """Parse the nodes out of a given NoDL file."""
     if isinstance(path, str):
         path = Path(path)
