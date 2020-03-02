@@ -16,8 +16,12 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
       fail-fast: false
     steps:
+    - uses: actions/checkout@v1
+
     - name: Setup ROS2
-      uses: ros-tooling/setup-ros2@0.0.12
+      uses: ros-tooling/setup-ros@0.0.15
+      with:
+        required-ros-distributions: eloquent
 
     - name: Extra Mac Dependencies
       if: contains(matrix.os, 'macos-latest')
