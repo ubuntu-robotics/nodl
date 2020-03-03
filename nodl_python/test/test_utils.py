@@ -10,14 +10,12 @@
 # You should have received a copy of the GNU Limited General Public License along with
 # this program. If not, see <http://www.gnu.org/licenses/>.
 
+from lxml import etree
+from nodl._util import get_bool_attribute
 
-from ament_mypy.main import main
-import pytest
 
-
-@pytest.mark.mypy
-@pytest.mark.linter
-def test_mypy():
-    """Perform mypy static type analysis."""
-    rc = main([])
-    assert rc == 0, 'Found code style errors / warnings'
+def test_get_bool_attribute_except(mocker):
+    foo = etree.Element('foo', {'bar': 'true'})
+    assert get_bool_attribute(foo, 'bar')
+    foo.set('bar', 'false')
+    assert not get_bool_attribute(foo, 'bar')

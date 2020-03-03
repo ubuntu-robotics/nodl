@@ -16,11 +16,25 @@ jobs:
         os: [ubuntu-latest, windows-latest, macos-latest]
       fail-fast: false
     steps:
-    - uses: ros-tooling/setup-ros2@0.0.12
-    - uses: ros-tooling/action-ros-ci@0.0.13
+    - uses: actions/checkout@v1
+
+    - name: Setup ROS2
+      uses: ros-tooling/setup-ros@0.0.15
+      with:
+        required-ros-distributions: eloquent
+
+    - name: Extra Mac Dependencies
+      if: contains(matrix.os, 'macos-latest')
+      run: |
+        pip3 install lxml
+
+    - name: Run Tests
+      uses: ros-tooling/action-ros-ci@0.0.13
       with:
         package-name: nodl_python
-    - uses: actions/upload-artifact@v1
+
+    - name: Upload Logs
+      uses: actions/upload-artifact@v1
       with:
         name: colcon-logs
         path: ros_ws/log

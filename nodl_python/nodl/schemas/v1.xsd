@@ -1,0 +1,81 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+    <xs:element name="qos">
+        <xs:complexType>
+            <xs:attribute name="history" type="xs:string"/>
+            <xs:attribute name="reliability" type="xs:string"/>
+            <xs:attribute name="durability" type="xs:string"/>
+            <xs:attribute name="depth" type="xs:integer"/>
+            <xs:attribute name="lifespan" type="xs:decimal"/>
+            <xs:attribute name="deadline" type="xs:decimal"/>
+            <xs:attribute name="liveliness" type="xs:string"/>
+            <xs:attribute name="liveliness_lease_duration" type="xs:decimal"/>
+            <xs:attribute name="avoid_ros_namespace_conventions" type="xs:boolean"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="action">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="qos"/>
+            </xs:sequence>
+            <xs:attribute name="name" type="xs:string" use="required"/>
+            <xs:attribute name="type" type="xs:string" use="required"/>
+            <xs:attribute name="server" type="xs:boolean" default="false"/>
+            <xs:attribute name="client" type="xs:boolean" default="false"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="parameter">
+        <xs:complexType>
+            <xs:attribute name="name" type="xs:string" use="required"/>
+            <xs:attribute name="type" type="xs:string" use="required"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="service">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="qos"/>
+            </xs:sequence>
+            <xs:attribute name="name" type="xs:string" use="required"/>
+            <xs:attribute name="type" type="xs:string" use="required"/>
+            <xs:attribute name="server" type="xs:boolean" default="false"/>
+            <xs:attribute name="client" type="xs:boolean" default="false"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="topic">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element ref="qos"/>
+            </xs:sequence>
+            <xs:attribute name="name" type="xs:string" use="required"/>
+            <xs:attribute name="type" type="xs:string" use="required"/>
+            <xs:attribute name="publisher" type="xs:boolean" default="false"/>
+            <xs:attribute name="subscription" type="xs:boolean" default="false"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="node">
+        <xs:complexType>
+            <xs:choice minOccurs="1" maxOccurs="unbounded">
+                <xs:element ref="action"/>
+                <xs:element ref="parameter"/>
+                <xs:element ref="topic"/>
+                <xs:element ref="service"/>
+            </xs:choice>
+            <xs:attribute name="name" type="xs:string" use="required"/>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="interface">
+        <xs:complexType>
+            <xs:choice maxOccurs="unbounded">
+                <xs:element ref="node"></xs:element>
+            </xs:choice>
+            <xs:attribute name="version" fixed="1" use="required"/>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>

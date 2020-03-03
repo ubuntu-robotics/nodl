@@ -10,14 +10,14 @@
 # You should have received a copy of the GNU Limited General Public License along with
 # this program. If not, see <http://www.gnu.org/licenses/>.
 
+import distutils.util
+from typing import TYPE_CHECKING
 
-from ament_mypy.main import main
-import pytest
+if TYPE_CHECKING:  # pragma: no cover
+    from lxml import etree
 
 
-@pytest.mark.mypy
-@pytest.mark.linter
-def test_mypy():
-    """Perform mypy static type analysis."""
-    rc = main([])
-    assert rc == 0, 'Found code style errors / warnings'
+def get_bool_attribute(element: 'etree._Element', attribute: str) -> bool:
+    """Access attribute and bool conversion."""
+    boolean_string = element.get(attribute, 'False')
+    return bool(distutils.util.strtobool(boolean_string))
