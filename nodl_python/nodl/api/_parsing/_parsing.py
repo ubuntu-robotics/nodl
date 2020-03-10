@@ -14,10 +14,10 @@ from pathlib import Path
 from typing import IO, List, Union
 
 from lxml import etree
-from nodl import errors
-from nodl._parsing import _v1 as parse_v1
-from nodl._parsing._schemas import interface_schema
-from nodl.types import Node
+from nodl.api import errors
+from nodl.api._parsing import _v1 as parse_v1
+from nodl.api._parsing._schemas import interface_schema
+from nodl.api.types import Node
 
 
 NODL_MAX_SUPPORTED_VERSION = 1

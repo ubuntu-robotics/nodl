@@ -11,8 +11,8 @@
 # this program. If not, see <http://www.gnu.org/licenses/>.
 
 from lxml import etree
-from nodl import errors
-from nodl._util import get_bool_attribute
+from nodl.api import errors
+from nodl.api._util import get_bool_attribute
 from rclpy import qos
 from rclpy.duration import Duration
 

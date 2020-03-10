@@ -9,6 +9,3 @@
 #
 # You should have received a copy of the GNU Limited General Public License along with
 # this program. If not, see <http://www.gnu.org/licenses/>.
-
-
-from ._parsing import parse  # noqa: F401

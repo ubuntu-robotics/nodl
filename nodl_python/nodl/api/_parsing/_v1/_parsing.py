@@ -13,11 +13,11 @@
 from typing import List
 
 from lxml import etree
-from nodl import errors
-from nodl._parsing._schemas import v1_schema
-from nodl._parsing._v1._qos import _parse_qos
-from nodl._util import get_bool_attribute
-from nodl.types import Action, Node, Parameter, Service, Topic
+from nodl.api import errors
+from nodl.api._parsing._schemas import v1_schema
+from nodl.api._parsing._v1._qos import _parse_qos
+from nodl.api._util import get_bool_attribute
+from nodl.api.types import Action, Node, Parameter, Service, Topic
 
 
 def _parse_action(element: etree._Element) -> Action:

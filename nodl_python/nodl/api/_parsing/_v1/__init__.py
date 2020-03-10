@@ -10,12 +10,5 @@
 # You should have received a copy of the GNU Limited General Public License along with
 # this program. If not, see <http://www.gnu.org/licenses/>.
 
-from lxml import etree
-from nodl.api._util import get_bool_attribute
 
-
-def test_get_bool_attribute_except(mocker):
-    foo = etree.Element('foo', {'bar': 'true'})
-    assert get_bool_attribute(foo, 'bar')
-    foo.set('bar', 'false')
-    assert not get_bool_attribute(foo, 'bar')
+from ._parsing import parse  # noqa: F401
