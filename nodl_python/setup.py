@@ -28,7 +28,7 @@ setup(
         'Programming Language :: Python',
         'Topic :: Software Development',
     ],
-    description='CLI and parsing utilities for the ROS 2 NoDL',
+    description='Implementation of the NoDL API in Python.',
     license='GNU Limited General Public License v3',
     tests_require=['pytest'],
     package_data={
