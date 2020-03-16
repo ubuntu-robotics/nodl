@@ -13,6 +13,8 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
+        # windows testing is broken, re-add when the following is resolved
+        # https://github.com/ros-tooling/action-ros-ci/issues/79
         os: [ubuntu-latest, macos-latest]
       fail-fast: false
     steps:
