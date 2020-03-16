@@ -3,7 +3,7 @@
 <package format="3">
   <name>nodl_python</name>
   <version>0.0.1</version>
-  <description>CLI and parsing utilities for the ROS 2 NoDL</description>
+  <description>Implementation of the NoDL API in Python.</description>
   <maintainer email="ubuntu-robotics@lists.launchpad.net">Ubuntu Robotics</maintainer>
   <license>GNU Lesser General Public License 3.0</license>
 
