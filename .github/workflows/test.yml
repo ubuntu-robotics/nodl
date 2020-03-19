@@ -13,7 +13,9 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macos-latest]
+        # windows testing is broken, re-add when the following is resolved
+        # https://github.com/ros-tooling/action-ros-ci/issues/79
+        os: [ubuntu-latest, macos-latest]
       fail-fast: false
     steps:
     - uses: actions/checkout@v1
