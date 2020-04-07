@@ -11,13 +11,15 @@ import pytest
 
 @pytest.fixture()
 def valid_nodl() -> etree._ElementTree:
-    return etree.parse(str(Path('test/nodl.xml')))
+    return etree.parse(str(Path('test/nodl/test.nodl.xml')))
 
 
 def test_parse(valid_nodl):
     # Assert a minimal example passes validation
     element = E.interface(
-        E.node(E.action(E.qos(depth='10'), name='bar', type='baz', server='true'), name='foo'),
+        E.node(
+            E.action(E.qos(depth='10'), name='bar', type='baz', server='true'), name='foo'
+        ),
         version='1',
     )
     assert nodl._parsing._v1.parse(element)
@@ -32,7 +34,7 @@ def test_parse(valid_nodl):
 
 
 def test__parse_action():
-    element = E.action(E.qos(depth='10'), name='foo', type='bar', server='true')
+    element = E.action(E.qos(depth='10'), name='foo', value_type='bar', server='true')
 
     # Test that actions get parsed
     action = nodl._parsing._v1._parsing._parse_action(element)
@@ -60,7 +62,7 @@ def test__parse_parameter():
 
 def test__parse_service():
     # Test that parse fails when missing name/type
-    element = E.service(E.qos(depth='10'), name='foo', type='bar', server='true')
+    element = E.service(E.qos(depth='10'), name='foo', value_type='bar', server='true')
 
     # Test that services get parsed
     service = nodl._parsing._v1._parsing._parse_service(element)
@@ -77,7 +79,7 @@ def test__parse_service():
 
 def test__parse_topic():
     # Test that parse fails when missing name/type
-    element = E.topic(E.qos(depth='10'), name='foo', type='bar', publisher='true')
+    element = E.topic(E.qos(depth='10'), name='foo', value_type='bar', publisher='true')
 
     topic = nodl._parsing._v1._parsing._parse_topic(element)
     assert topic.publisher

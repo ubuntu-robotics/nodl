@@ -34,7 +34,14 @@ def _parse_interface(interface: etree._Element) -> List[Node]:
 
 
 def _parse_element_tree(element_tree: etree._ElementTree) -> List[Node]:
-    """Extract an interface element from an ElementTree if present."""
+    """Extract an interface element from an ElementTree if present.
+
+    :param element_tree: parsed xml tree to operate on
+    :type element_tree: etree._ElementTree
+    :raises errors.InvalidNoDLDocumentError: raised if tree does not adhere to schema
+    :return: List of NoDL nodes present in the xml tree.
+    :rtype: List[Node]
+    """
     try:
         interface_schema().assertValid(element_tree)
     except etree.DocumentInvalid as e:
@@ -43,7 +50,14 @@ def _parse_element_tree(element_tree: etree._ElementTree) -> List[Node]:
 
 
 def parse(path: Union[str, Path, IO]) -> List[Node]:
-    """Parse the nodes out of a given NoDL file."""
+    """Parse the nodes out of a given NoDL file.
+
+    :param path: location of file, or opened file object
+    :type path: Union[str, Path, IO]
+    :raises errors.InvalidNoDLDocumentError: raised if tree does not adhere to schema
+    :return: List of NoDL nodes present in the file
+    :rtype: List[Node]
+    """
     if isinstance(path, str):
         path = Path(path)
     if isinstance(path, Path):

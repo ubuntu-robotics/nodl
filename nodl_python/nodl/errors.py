@@ -45,6 +45,7 @@ class InvalidElementError(InvalidNoDLError):
             f'Error parsing {element.tag} from {element.base}, line {element.sourceline}: '
             + message
         )
+        self.element = element
 
 
 class InvalidQoSError(InvalidElementError):
@@ -67,6 +68,7 @@ class InvalidQOSAttributeValueError(InvalidQoSError):
         super().__init__(
             f'Value: {element.get(attribute)} is not valid for attribute {attribute}', element
         )
+        self.attribute = attribute
 
 
 class InvalidActionError(InvalidElementError):
