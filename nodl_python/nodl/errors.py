@@ -47,10 +47,19 @@ class InvalidNoDLError(NoDLError):
     """Exception class representing most errors in parsing the NoDL tree."""
 
 
+class InvalidXMLError(InvalidNoDLError):
+    """Error raised when unable to parse XML."""
+
+    def __init__(self, err: etree.XMLSyntaxError):
+        super().__init__(
+            f'XML syntax error: {err.filename}: {err.msg}'
+        )
+
+
 class InvalidNoDLDocumentError(InvalidNoDLError):
     """Error raised when schema validation fails."""
 
-    def __init__(self, invalid: etree.DocumentInvalid) -> None:
+    def __init__(self, invalid: etree.DocumentInvalid):
         self.invalid = invalid
         e = invalid.error_log[0]
         super().__init__(
@@ -61,7 +70,7 @@ class InvalidNoDLDocumentError(InvalidNoDLError):
 class InvalidElementError(InvalidNoDLError):
     """Base class for all bad NoDL elements."""
 
-    def __init__(self, message: str, element: etree._Element) -> None:
+    def __init__(self, message: str, element: etree._Element):
         super().__init__(
             f'Error parsing {element.tag} from {element.base}, line {element.sourceline}: '
             + message
