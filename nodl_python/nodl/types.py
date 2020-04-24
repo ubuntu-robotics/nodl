@@ -117,12 +117,14 @@ class Node(NoDLData):
         self,
         *,
         name: str,
+        executable: str,
         actions: Optional[List[Action]] = None,
         parameters: Optional[List[Parameter]] = None,
         services: Optional[List[Service]] = None,
         topics: Optional[List[Topic]] = None
     ) -> None:
         self.name = name
+        self.executable = executable
 
         self.actions = {action.name: action for action in actions} if actions else {}
         self.parameters = (
@@ -135,6 +137,7 @@ class Node(NoDLData):
     def _as_dict(self):
         return {
             'name': self.name,
+            'executable': self.executable,
             'actions': [action._as_dict for action in self.actions.values()],
             'parameters': [parameter._as_dict for parameter in self.parameters.values()],
             'services': [service._as_dict for service in self.services.values()],

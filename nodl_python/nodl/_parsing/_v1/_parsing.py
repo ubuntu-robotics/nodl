@@ -85,6 +85,7 @@ def _parse_nodes(interface: etree._Element) -> List[Node]:
 def _parse_node(node: etree._Element) -> Node:
     """Parse a NoDL node and all the elements it contains from an xml element."""
     name = node.attrib['name']
+    executable = node.attrib['executable']
 
     actions = []
     parameters = []
@@ -101,7 +102,12 @@ def _parse_node(node: etree._Element) -> Node:
         if child.tag == 'topic':
             topics.append(_parse_topic(child))
     return Node(
-        name=name, actions=actions, parameters=parameters, services=services, topics=topics
+        name=name,
+        executable=executable,
+        actions=actions,
+        parameters=parameters,
+        services=services,
+        topics=topics,
     )
 
 

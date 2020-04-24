@@ -83,8 +83,9 @@ def test_node():
     topic = nodl.types.Topic(name='foo', message_type='bar')
     service = nodl.types.Service(name='baz', service_type='woo')
 
-    node = nodl.types.Node(name='test', topics=[topic], services=[service])
+    node = nodl.types.Node(name='test', executable='toast', topics=[topic], services=[service])
     assert node.name == 'test'
+    assert node.executable == 'toast'
     assert node.topics[topic.name] == topic
     assert node.services[service.name] == service
 
@@ -93,6 +94,7 @@ def test_node__as_dict():
     topic = nodl.types.Topic(name='foo', message_type='bar')
     service = nodl.types.Service(name='baz', service_type='woo')
 
-    node = nodl.types.Node(name='test', topics=[topic], services=[service])
+    node = nodl.types.Node(name='test', executable='toast', topics=[topic], services=[service])
     assert node._as_dict['name'] == node.name
+    assert node._as_dict['executable'] == node.executable
     assert topic._as_dict in node._as_dict['topics']
