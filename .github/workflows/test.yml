@@ -7,35 +7,59 @@ on:
     - cron: '0 0 * * *'
 
 jobs:
-  build-and-test:
+  build-mac-win:
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         # windows testing is broken, re-add when the following is resolved
         # https://github.com/ros-tooling/action-ros-ci/issues/79
-        os: [ubuntu-latest, macos-latest]
-      fail-fast: false
+        os:
+          - macos-latest
+          - windows-latest
+        ros_distribution:
+          - foxy
     steps:
-    - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
 
-    - name: Setup ROS2
-      uses: ros-tooling/setup-ros@0.0.20
-      with:
-        required-ros-distributions: eloquent
+      - name: Setup ROS2
+        uses: ros-tooling/setup-ros@0.0.20
+        with:
+          required-ros-distributions: ${{ matrix.ros_distribution }}
 
-    - name: Extra Mac Dependencies
-      if: contains(matrix.os, 'macos-latest')
-      run: |
-        pip3 install lxml
+      - name: Extra Dependencies
+        run: |
+          pip3 install lxml
 
-    - name: Run Tests
-      uses: ros-tooling/action-ros-ci@0.0.16
-      with:
-        package-name: nodl_python
+      - name: Run Tests
+        uses: ros-tooling/action-ros-ci@0.0.16
+        id: action_ros_ci_step
+        with:
+          package-name: nodl_python
 
-    - name: Upload Logs
-      uses: actions/upload-artifact@v1
-      with:
-        name: colcon-logs
-        path: ros_ws/log
-      if: always()
+      - name: Upload Logs
+        uses: actions/upload-artifact@v1
+        with:
+          name: colcon-logs
+          path: ${{ steps.action_ros_ci_step.outputs.ros-workspace-directory-name }}/log
+        if: always()
+
+  build-docker:
+    runs-on: ubuntu-latest
+    container:
+      image: osrf/ros2:devel
+    steps:
+      - name: Setup ROS2
+        uses: ros-tooling/setup-ros@0.0.20
+      - name: Run Tests
+        uses: ros-tooling/action-ros-ci@0.0.16
+        id: action_ros_ci_step
+        with:
+          package-name: nodl_python
+      - name: Upload Logs
+        uses: actions/upload-artifact@v1
+        with:
+          name: colcon-logs
+          path: ${{ steps.action_ros_ci_step.outputs.ros-workspace-directory-name }}/log
+        if: always()
+
