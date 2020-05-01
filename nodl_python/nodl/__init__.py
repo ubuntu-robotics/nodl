@@ -11,4 +11,4 @@
 # this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-from ._parsing import parse  # noqa: F401
+from ._parsing import parse, parse_multiple  # noqa: F401

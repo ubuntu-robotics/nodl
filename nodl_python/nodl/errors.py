@@ -15,11 +15,26 @@ from typing import TYPE_CHECKING
 from lxml import etree
 
 if TYPE_CHECKING:  # pragma: no cover
+    from .types import Node
     import rclpy.qos
 
 
 class NoDLError(Exception):
     """Base class for all NoDL exceptions."""
+
+
+class NoNoDLFilesError(NoDLError):
+    """Exception raised when a package has no NoDL files in the ament index."""
+
+    def __init__(self, package_name):
+        super().__init__(f'{package_name} has no NoDL files in its ament index.')
+
+
+class DuplicateNodeError(NoDLError):
+    """Exception raised when a node is redefined."""
+
+    def __init__(self, node: 'Node'):
+        super().__init__(f'Error: Multiple definitions of {node.name} found in {node.executable}!')
 
 
 class InvalidNoDLError(NoDLError):
