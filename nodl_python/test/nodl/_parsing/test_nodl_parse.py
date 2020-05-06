@@ -76,6 +76,17 @@ def test_parse_multiple_accepts_disjoint_nodes(mocker):
     assert all(node in result for node in parse_mock.side_effect)
 
 
+def test_parse_allow_duplicate_different_executable(mocker):
+    parse_mock = mocker.patch('nodl._parsing._parsing.parse')
+    parse_mock.side_effect = [
+        [nodl.types.Node(name='foo', executable='foo')],
+        [nodl.types.Node(name='foo', executable='bar')],
+    ]
+
+    result = nodl._parsing._parsing.parse_multiple(paths=['foo', 'bar'])
+    assert all(node in result for node in parse_mock.side_effect)
+
+
 def test_parse_multiple_error_on_duplicate(mocker):
     parse_mock = mocker.patch('nodl._parsing._parsing.parse')
 

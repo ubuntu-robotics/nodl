@@ -37,6 +37,15 @@ class DuplicateNodeError(NoDLError):
         super().__init__(f'Error: Multiple definitions of {node.name} found in {node.executable}!')
 
 
+class ExecutableNotFoundError(NoDLError):
+    """Exception raised when a package is queried for an executable with no NoDL entry attached."""
+
+    def __init__(self, package_name: str, executable_name: str):
+        super().__init__(
+            f'{package_name} has no matching nodl entries for executable "{executable_name}"'
+        )
+
+
 class InvalidNoDLError(NoDLError):
     """Exception class representing most errors in parsing the NoDL tree."""
 
