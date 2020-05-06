@@ -11,8 +11,6 @@
 # this program. If not, see <http://www.gnu.org/licenses/>.
 
 
-from pathlib import Path
-
 from lxml.builder import E
 import lxml.etree as etree
 from nodl import errors
@@ -37,17 +35,17 @@ def test__parse_element_tree(mocker):
     assert nodl._parsing._parsing._parse_element_tree(etree.ElementTree(interface))
 
 
-def test_parse_nodl_file_valid(mocker):
+def test_parse_nodl_file_valid(mocker, test_nodl_path):
     mocker.patch('nodl._parsing._parsing._parse_element_tree')
 
     # Test if accepts a valid xml file
-    assert nodl._parsing._parsing.parse(path=Path('test/nodl/test.nodl.xml')) is not None
+    assert nodl._parsing._parsing.parse(path=test_nodl_path) is not None
 
     # Test if accepts file name as string
-    assert nodl._parsing._parsing.parse(path='test/nodl/test.nodl.xml') is not None
+    assert nodl._parsing._parsing.parse(path=str(test_nodl_path)) is not None
 
     # Test if accepts file object
-    with open('test/nodl/test.nodl.xml', 'rb') as fd:
+    with test_nodl_path.open('rb') as fd:
         assert nodl._parsing._parsing.parse(path=fd) is not None
 
 

@@ -67,6 +67,7 @@
                 <xs:element ref="service"/>
             </xs:choice>
             <xs:attribute name="name" type="xs:string" use="required"/>
+            <xs:attribute name="executable" type="xs:string" use="required"/>
         </xs:complexType>
     </xs:element>
 

@@ -1,12 +1,12 @@
 <interface version="1">
-  <node name="node_1" >
+  <node name="node_1" executable="first" >
     <parameter name="verbose" type="bool" />
     <topic name="chatter" type="std_msgs/msg/String" publisher="true">
       <qos depth="10"/>
     </topic>
   </node>
 
-  <node name="node_2" >
+  <node name="node_2" executable="second" >
     <parameter name="rate" type="int" />
     <topic name="/foo/bar" type="std_msgs/msg/String" subscription="true">
       <qos

@@ -1,5 +1,3 @@
-from pathlib import Path
-
 from lxml.builder import E
 import lxml.etree as etree
 from nodl import errors
@@ -10,15 +8,17 @@ import pytest
 
 
 @pytest.fixture()
-def valid_nodl() -> etree._ElementTree:
-    return etree.parse(str(Path('test/nodl/test.nodl.xml')))
+def valid_nodl(test_nodl_path) -> etree._ElementTree:
+    return etree.parse(str(test_nodl_path))
 
 
 def test_parse(valid_nodl):
     # Assert a minimal example passes validation
     element = E.interface(
         E.node(
-            E.action(E.qos(depth='10'), name='bar', type='baz', server='true'), name='foo'
+            E.action(E.qos(depth='10'), name='bar', type='baz', server='true'),
+            name='foo',
+            executable='row',
         ),
         version='1',
     )
