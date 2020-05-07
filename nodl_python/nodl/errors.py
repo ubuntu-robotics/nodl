@@ -26,7 +26,7 @@ class NoDLError(Exception):
 class NoNoDLFilesError(NoDLError):
     """Exception raised when a package has no NoDL files in the ament index."""
 
-    def __init__(self, package_name):
+    def __init__(self, package_name: str):
         super().__init__(f'{package_name} has no NoDL files in its ament index.')
 
 
