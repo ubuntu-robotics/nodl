@@ -50,7 +50,7 @@ def test__get_nodl_files_from_package_share(mocker, tmp_share):
 
 def test__get_nodes_from_package(mocker):
     mock_package = mocker.patch('nodl.index._index._get_nodl_files_from_package_share')
-    mock_parse = mocker.patch('nodl.index._index.parse_multiple')
+    mock_parse = mocker.patch('nodl.index._index._parse_multiple')
 
     res = nodl.index._index._get_nodes_from_package(package_name='foo')
     mock_package.assert_called_with(package_name='foo')

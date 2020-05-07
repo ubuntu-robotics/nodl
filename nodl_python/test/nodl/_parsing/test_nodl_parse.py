@@ -53,15 +53,15 @@ def test_parse_multiple_accepts_lists(mocker, test_nodl_path):
     mocker.patch('nodl._parsing._parsing._parse_element_tree')
 
     assert (
-        nodl._parsing._parsing.parse_multiple(paths=[test_nodl_path]) is not None
+        nodl._parsing._parsing._parse_multiple(paths=[test_nodl_path]) is not None
     )
 
     # Test if accepts file name as string
-    assert nodl._parsing._parsing.parse_multiple(paths=[str(test_nodl_path)]) is not None
+    assert nodl._parsing._parsing._parse_multiple(paths=[str(test_nodl_path)]) is not None
 
     # Test if accepts file object
     with test_nodl_path.open('rb') as fd:
-        assert nodl._parsing._parsing.parse_multiple(paths=[fd]) is not None
+        assert nodl._parsing._parsing._parse_multiple(paths=[fd]) is not None
 
 
 def test_parse_multiple_accepts_disjoint_nodes(mocker):
@@ -72,7 +72,7 @@ def test_parse_multiple_accepts_disjoint_nodes(mocker):
         [nodl.types.Node(name='bar', executable='bar')],
     ]
 
-    result = nodl._parsing._parsing.parse_multiple(paths=['foo', 'bar'])
+    result = nodl._parsing._parsing._parse_multiple(paths=['foo', 'bar'])
     assert all(node in result for node in parse_mock.side_effect)
 
 
@@ -83,7 +83,7 @@ def test_parse_allow_duplicate_different_executable(mocker):
         [nodl.types.Node(name='foo', executable='bar')],
     ]
 
-    result = nodl._parsing._parsing.parse_multiple(paths=['foo', 'bar'])
+    result = nodl._parsing._parsing._parse_multiple(paths=['foo', 'bar'])
     assert all(node in result for node in parse_mock.side_effect)
 
 
@@ -96,7 +96,7 @@ def test_parse_multiple_error_on_duplicate(mocker):
     ]
 
     with pytest.raises(nodl.errors.DuplicateNodeError):
-        nodl._parsing._parsing.parse_multiple(paths=['foo', 'bar'])
+        nodl._parsing._parsing._parse_multiple(paths=['foo', 'bar'])
 
 
 def test_parse_interface(mocker):

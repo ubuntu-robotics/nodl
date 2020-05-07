@@ -16,7 +16,7 @@ from typing import List, Sequence, TYPE_CHECKING
 
 from ament_index_python.packages import get_package_share_directory
 
-from nodl._parsing import parse_multiple
+from nodl._parsing._parsing import _parse_multiple
 from nodl.errors import ExecutableNotFoundError, NoNoDLFilesError
 
 if TYPE_CHECKING:  # pragma: no cover
@@ -50,7 +50,7 @@ def _get_nodes_from_package(*, package_name: str) -> List['Node']:
     :rtype: List[Node]
     """
     nodl_files = _get_nodl_files_from_package_share(package_name=package_name)
-    return parse_multiple(paths=nodl_files)
+    return _parse_multiple(paths=nodl_files)
 
 
 def _get_node_by_executable(*, nodes: Sequence['Node'], executable_name: str) -> 'Node':

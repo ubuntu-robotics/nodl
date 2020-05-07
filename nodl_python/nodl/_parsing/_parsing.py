@@ -66,7 +66,7 @@ def parse(path: Union[str, Path, IO]) -> List[Node]:
     return _parse_element_tree(element_tree)
 
 
-def parse_multiple(paths: Sequence[Union[str, Path, IO]]) -> List[Node]:
+def _parse_multiple(paths: Sequence[Union[str, Path, IO]]) -> List[Node]:
     """Merge nodl files into one large node list.
 
     :param paths: List of nodl files to parse
