@@ -12,15 +12,14 @@
 
 
 from pathlib import Path
-from typing import List, Sequence, TYPE_CHECKING
+from typing import List
 
 from ament_index_python.packages import get_package_share_directory
 
 from nodl._parsing._parsing import _parse_multiple
 from nodl.errors import ExecutableNotFoundError, NoNoDLFilesError
 
-if TYPE_CHECKING:  # pragma: no cover
-    from .types import Node  # noqa: F401
+from .types import Node
 
 
 def _get_nodl_xml_files_in_path(*, path: Path) -> List[Path]:
@@ -41,7 +40,7 @@ def _get_nodl_files_from_package_share(*, package_name: str) -> List[Path]:
     return nodl_paths
 
 
-def _get_nodes_from_package(*, package_name: str) -> List['Node']:
+def _get_nodes_from_package(*, package_name: str) -> List[Node]:
     """Return results of parsing all nodl.xml files of a package.
 
     :param package_name: name of the package
@@ -53,21 +52,7 @@ def _get_nodes_from_package(*, package_name: str) -> List['Node']:
     return _parse_multiple(paths=nodl_files)
 
 
-def _get_node_by_executable(*, nodes: Sequence['Node'], executable_name: str) -> 'Node':
-    """Return node associated with given executable from a provided list of nodes.
-
-    :param nodes: a list of nodes to search in
-    :type nodes: List[Node]
-    :param executable_name: the name of the executable the node is associated with
-    :type executable_name: str
-    :return: A Node in nodes such that node.executable == executable_name
-    :rtype: Node
-    :raises StopIteration: if no node is associated with the executable
-    """
-    return next(node for node in nodes if node.executable == executable_name)
-
-
-def get_node_by_executable(*, package_name: str, executable_name: str) -> 'Node':
+def get_node_by_executable(*, package_name: str, executable_name: str) -> Node:
     """Return node associated with given executable from a package's exported nodl.
 
     :param package_name: name of the package to search in
@@ -79,10 +64,8 @@ def get_node_by_executable(*, package_name: str, executable_name: str) -> 'Node'
     :rtype: Node
     """
     try:
-        result = _get_node_by_executable(
-            nodes=_get_nodes_from_package(package_name=package_name),
-            executable_name=executable_name,
-        )
+        nodes = _get_nodes_from_package(package_name=package_name)
+        result = next(node for node in nodes if node.executable == executable_name)
     except StopIteration:
         raise ExecutableNotFoundError(package_name=package_name, executable_name=executable_name)
     return result

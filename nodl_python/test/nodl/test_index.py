@@ -62,18 +62,6 @@ def test_nodes(mocker):
     return [mocker.MagicMock(executable=executable) for executable in ['foo', 'bar', 'baz']]
 
 
-def test__get_node_by_executable(mocker, test_nodes):
-    assert (
-        nodl._index._get_node_by_executable(
-            nodes=test_nodes, executable_name='baz'
-        ).executable
-        == 'baz'
-    )
-
-    with pytest.raises(StopIteration):
-        nodl._index._get_node_by_executable(nodes=test_nodes, executable_name='fizz')
-
-
 def test_get_node_by_executable(mocker, test_nodes):
     mocker.patch('nodl._index._get_nodes_from_package', return_value=test_nodes)
 
