@@ -10,13 +10,10 @@
 # You should have received a copy of the GNU Limited General Public License along with
 # this program. If not, see <http://www.gnu.org/licenses/>.
 
-from typing import TYPE_CHECKING
-
 from lxml import etree
+import rclpy.qos
 
-if TYPE_CHECKING:  # pragma: no cover
-    from .types import Node
-    import rclpy.qos
+from .types import Node
 
 
 class NoDLError(Exception):
