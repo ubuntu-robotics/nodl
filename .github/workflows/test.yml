@@ -16,7 +16,6 @@ jobs:
         # https://github.com/ros-tooling/action-ros-ci/issues/79
         os:
           - macos-latest
-          - windows-latest
         ros_distribution:
           - foxy
     steps:
@@ -47,7 +46,7 @@ jobs:
   build-docker:
     runs-on: ubuntu-latest
     container:
-      image: osrf/ros2:devel
+      image: ubuntu:focal
     steps:
       - name: Setup ROS2
         uses: ros-tooling/setup-ros@2c05014
