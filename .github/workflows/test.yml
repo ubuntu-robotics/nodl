@@ -50,7 +50,7 @@ jobs:
       image: osrf/ros2:devel
     steps:
       - name: Setup ROS2
-        uses: ros-tooling/setup-ros@0.0.20
+        uses: ros-tooling/setup-ros@2c05014
       - name: Run Tests
         uses: ros-tooling/action-ros-ci@0.0.16
         id: action_ros_ci_step
