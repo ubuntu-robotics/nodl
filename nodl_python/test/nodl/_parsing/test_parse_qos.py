@@ -58,9 +58,9 @@ def test__parse_qos():
     element.set('liveliness', 'system_default')
     qos_profile = nodl._parsing._v1._qos._parse_qos(element)
     assert qos_profile.liveliness == qos.LivelinessPolicy.SYSTEM_DEFAULT
-    element.set('liveliness', 'manual_by_node')
+    element.set('liveliness', 'manual_by_topic')
     qos_profile = nodl._parsing._v1._qos._parse_qos(element)
-    assert qos_profile.liveliness == qos.LivelinessPolicy.MANUAL_BY_NODE
+    assert qos_profile.liveliness == qos.LivelinessPolicy.MANUAL_BY_TOPIC
 
     # Liveliness Lease Duration
     element.set('liveliness_lease_duration', '451')
