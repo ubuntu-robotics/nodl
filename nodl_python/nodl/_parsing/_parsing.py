@@ -10,7 +10,6 @@
 # You should have received a copy of the GNU Limited General Public License along with
 # this program. If not, see <http://www.gnu.org/licenses/>.
 
-from collections import defaultdict
 from pathlib import Path
 from typing import Dict, IO, List, Sequence, Union
 
@@ -77,13 +76,10 @@ def _parse_multiple(paths: Sequence[Union[str, Path, IO]]) -> List[Node]:
     :rtype: List[Node]
     """
     node_lists = [parse(path) for path in paths]
-    combined = []
-    combined_dict: Dict[str, List] = defaultdict(list)
+    combined_dict: Dict[str, Node] = {}
     for node_list in node_lists:
         for node in node_list:
-            if node.name in combined_dict:
-                if node.executable in combined_dict[node.name]:
-                    raise DuplicateNodeError(node=node)
-            combined_dict[node.name].append(node.executable)
-            combined.append(node)
-    return combined
+            if node.executable in combined_dict:
+                raise DuplicateNodeError(node=node)
+            combined_dict[node.executable] = node
+    return list(combined_dict.values())

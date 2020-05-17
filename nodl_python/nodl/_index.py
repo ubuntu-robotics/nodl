@@ -63,8 +63,8 @@ def get_node_by_executable(*, package_name: str, executable_name: str) -> Node:
     :return: Node with matching executable field
     :rtype: Node
     """
+    nodes = _get_nodes_from_package(package_name=package_name)
     try:
-        nodes = _get_nodes_from_package(package_name=package_name)
         result = next(node for node in nodes if node.executable == executable_name)
     except StopIteration:
         raise ExecutableNotFoundError(package_name=package_name, executable_name=executable_name)
