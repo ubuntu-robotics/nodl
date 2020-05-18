@@ -11,20 +11,19 @@
 # this program. If not, see <http://www.gnu.org/licenses/>.
 
 import distutils.util
-from typing import Dict, TYPE_CHECKING
+from typing import Dict
 
-if TYPE_CHECKING:  # pragma: no cover
-    from lxml import etree
-    from rclpy.qos import QoSProfile
+from lxml import etree
+from rclpy.qos import QoSProfile
 
 
-def get_bool_attribute(element: 'etree._Element', attribute: str) -> bool:
+def get_bool_attribute(element: etree._Element, attribute: str) -> bool:
     """Access attribute and bool conversion."""
     boolean_string = element.get(attribute, 'False')
     return bool(distutils.util.strtobool(boolean_string))
 
 
-def qos_to_dict(qos: 'QoSProfile') -> Dict[str, str]:
+def qos_to_dict(qos: QoSProfile) -> Dict[str, str]:
     return {
             'history': qos.history.short_key,
             'depth': qos.depth,

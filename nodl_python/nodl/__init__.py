@@ -11,4 +11,5 @@
 # this program. If not, see <http://www.gnu.org/licenses/>.
 
 
+from ._index import get_node_by_executable  # noqa: F401
 from ._parsing import parse  # noqa: F401

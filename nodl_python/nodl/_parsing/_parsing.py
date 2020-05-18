@@ -11,12 +11,12 @@
 # this program. If not, see <http://www.gnu.org/licenses/>.
 
 from pathlib import Path
-from typing import IO, List, Union
+from typing import Dict, IO, List, Sequence, Union
 
 from lxml import etree
-from nodl import errors
 from nodl._parsing import _v1 as parse_v1
 from nodl._parsing._schemas import interface_schema
+from nodl.errors import DuplicateNodeError, InvalidNoDLDocumentError, UnsupportedInterfaceError
 from nodl.types import Node
 
 
@@ -28,9 +28,7 @@ def _parse_interface(interface: etree._Element) -> List[Node]:
     if interface.get('version') == '1':
         return parse_v1.parse(interface)
     else:
-        raise errors.UnsupportedInterfaceError(
-            interface.get('version'), NODL_MAX_SUPPORTED_VERSION
-        )
+        raise UnsupportedInterfaceError(interface.get('version'), NODL_MAX_SUPPORTED_VERSION)
 
 
 def _parse_element_tree(element_tree: etree._ElementTree) -> List[Node]:
@@ -38,14 +36,14 @@ def _parse_element_tree(element_tree: etree._ElementTree) -> List[Node]:
 
     :param element_tree: parsed xml tree to operate on
     :type element_tree: etree._ElementTree
-    :raises errors.InvalidNoDLDocumentError: raised if tree does not adhere to schema
+    :raises InvalidNoDLDocumentError: if tree does not adhere to schema
     :return: List of NoDL nodes present in the xml tree.
     :rtype: List[Node]
     """
     try:
         interface_schema().assertValid(element_tree)
     except etree.DocumentInvalid as e:
-        raise errors.InvalidNoDLDocumentError(e)
+        raise InvalidNoDLDocumentError(e)
     return _parse_interface(element_tree.getroot())
 
 
@@ -54,7 +52,7 @@ def parse(path: Union[str, Path, IO]) -> List[Node]:
 
     :param path: location of file, or opened file object
     :type path: Union[str, Path, IO]
-    :raises errors.InvalidNoDLDocumentError: raised if tree does not adhere to schema
+    :raises InvalidNoDLDocumentError: raised if tree does not adhere to schema
     :return: List of NoDL nodes present in the file
     :rtype: List[Node]
     """
@@ -65,3 +63,23 @@ def parse(path: Union[str, Path, IO]) -> List[Node]:
     element_tree = etree.parse(path)
 
     return _parse_element_tree(element_tree)
+
+
+def _parse_multiple(paths: Sequence[Union[str, Path, IO]]) -> List[Node]:
+    """Merge nodl files into one large node list.
+
+    :param paths: List of nodl files to parse
+    :type paths: Sequence[Union[str, Path, IO]]
+    :raises DuplicateNodeError: if node is defined multiple times
+    :raises InvalidNoDLDocumentError: if doc does not adhere to schema
+    :return: flat list of nodes provided by the documents
+    :rtype: List[Node]
+    """
+    node_lists = [parse(path) for path in paths]
+    combined_dict: Dict[str, Node] = {}
+    for node_list in node_lists:
+        for node in node_list:
+            if node.executable in combined_dict:
+                raise DuplicateNodeError(node=node)
+            combined_dict[node.executable] = node
+    return list(combined_dict.values())

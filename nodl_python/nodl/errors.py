@@ -10,16 +10,37 @@
 # You should have received a copy of the GNU Limited General Public License along with
 # this program. If not, see <http://www.gnu.org/licenses/>.
 
-from typing import TYPE_CHECKING
-
 from lxml import etree
+import rclpy.qos
 
-if TYPE_CHECKING:  # pragma: no cover
-    import rclpy.qos
+from .types import Node
 
 
 class NoDLError(Exception):
     """Base class for all NoDL exceptions."""
+
+
+class NoNoDLFilesError(NoDLError):
+    """Exception raised when a package has no NoDL files in the ament index."""
+
+    def __init__(self, package_name: str):
+        super().__init__(f'{package_name} has no NoDL files in its ament index.')
+
+
+class DuplicateNodeError(NoDLError):
+    """Exception raised when a node is redefined."""
+
+    def __init__(self, node: 'Node'):
+        super().__init__(f'Error: Multiple definitions of {node.name} found in {node.executable}!')
+
+
+class ExecutableNotFoundError(NoDLError):
+    """Exception raised when a package is queried for an executable with no NoDL entry attached."""
+
+    def __init__(self, package_name: str, executable_name: str):
+        super().__init__(
+            f'{package_name} has no matching nodl entries for executable "{executable_name}"'
+        )
 
 
 class InvalidNoDLError(NoDLError):
