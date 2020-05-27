@@ -49,12 +49,19 @@ def test_parse_nodl_file_valid(mocker, test_nodl_path):
         assert nodl._parsing._parsing.parse(path=fd) is not None
 
 
+def test_parse_handles_bad_xml(mocker, test_nodl_path):
+    mocker.patch(
+        'nodl._parsing._parsing.etree.parse', side_effect=etree.XMLSyntaxError('', '', 404, 404),
+    )
+
+    with pytest.raises(nodl.errors.InvalidXMLError):
+        nodl._parsing._parsing.parse(mocker.Mock())
+
+
 def test_parse_multiple_accepts_lists(mocker, test_nodl_path):
     mocker.patch('nodl._parsing._parsing._parse_element_tree')
 
-    assert (
-        nodl._parsing._parsing._parse_multiple(paths=[test_nodl_path]) is not None
-    )
+    assert nodl._parsing._parsing._parse_multiple(paths=[test_nodl_path]) is not None
 
     # Test if accepts file name as string
     assert nodl._parsing._parsing._parse_multiple(paths=[str(test_nodl_path)]) is not None

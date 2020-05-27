@@ -11,12 +11,17 @@
 # this program. If not, see <http://www.gnu.org/licenses/>.
 
 from pathlib import Path
-from typing import Dict, IO, List, Sequence, Union
+from typing import Dict, IO, Iterable, List, Union
 
 from lxml import etree
 from nodl._parsing import _v1 as parse_v1
 from nodl._parsing._schemas import interface_schema
-from nodl.errors import DuplicateNodeError, InvalidNoDLDocumentError, UnsupportedInterfaceError
+from nodl.errors import (
+    DuplicateNodeError,
+    InvalidNoDLDocumentError,
+    InvalidXMLError,
+    UnsupportedInterfaceError,
+)
 from nodl.types import Node
 
 
@@ -60,16 +65,19 @@ def parse(path: Union[str, Path, IO]) -> List[Node]:
         path = Path(path)
     if isinstance(path, Path):
         path = str(path.resolve())
-    element_tree = etree.parse(path)
+    try:
+        element_tree = etree.parse(path)
+    except etree.XMLSyntaxError as e:
+        raise InvalidXMLError(e)
 
     return _parse_element_tree(element_tree)
 
 
-def _parse_multiple(paths: Sequence[Union[str, Path, IO]]) -> List[Node]:
+def _parse_multiple(paths: Iterable[Union[str, Path, IO]]) -> List[Node]:
     """Merge nodl files into one large node list.
 
     :param paths: List of nodl files to parse
-    :type paths: Sequence[Union[str, Path, IO]]
+    :type paths: Iterable[Union[str, Path, IO]]
     :raises DuplicateNodeError: if node is defined multiple times
     :raises InvalidNoDLDocumentError: if doc does not adhere to schema
     :return: flat list of nodes provided by the documents

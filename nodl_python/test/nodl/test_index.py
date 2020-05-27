@@ -10,6 +10,7 @@
 # You should have received a copy of the GNU Limited General Public License along with
 # this program. If not, see <http://www.gnu.org/licenses/>.
 
+from typing import List
 
 import nodl._index
 import nodl.errors
@@ -28,19 +29,11 @@ def tmp_share(tmp_path):
     return tmp_path
 
 
-def test__get_nodl_xml_files_in_path(tmp_share):
-    assert all(
-        fname in nodl._index._get_nodl_xml_files_in_path(path=tmp_share)
-        for fname in [tmp_share / 'a.nodl.xml', tmp_share / 'has_nodl/b.nodl.xml']
-    )
-
-
 def test__get_nodl_files_from_package_share(mocker, tmp_share):
     # Test gets all files recursively
     mock = mocker.patch('nodl._index.get_package_share_directory', return_value=tmp_share)
-    assert all(
-        fname in nodl._index._get_nodl_files_from_package_share(package_name='foo')
-        for fname in [tmp_share / 'a.nodl.xml', tmp_share / 'has_nodl/b.nodl.xml']
+    assert (tmp_share / 'a.nodl.xml') in nodl._index._get_nodl_files_from_package_share(
+        package_name='foo'
     )
 
     mock.return_value = tmp_share / 'no_nodl'
@@ -58,8 +51,11 @@ def test__get_nodes_from_package(mocker):
 
 
 @pytest.fixture
-def test_nodes(mocker):
-    return [mocker.MagicMock(executable=executable) for executable in ['foo', 'bar', 'baz']]
+def test_nodes(mocker) -> List[nodl.types.Node]:
+    return [
+        mocker.MagicMock(spec=nodl.types.Node, executable=executable)
+        for executable in ['foo', 'bar', 'baz']
+    ]
 
 
 def test_get_node_by_executable(mocker, test_nodes):
@@ -72,3 +68,15 @@ def test_get_node_by_executable(mocker, test_nodes):
 
     with pytest.raises(nodl.errors.ExecutableNotFoundError):
         nodl._index.get_node_by_executable(package_name='', executable_name='fizz')
+
+
+def test_get_nodes_by_executables(mocker, test_nodes):
+    mocker.patch('nodl._index._get_nodes_from_package', autospec=True, return_value=test_nodes)
+
+    nodes, missing = nodl._index._get_nodes_by_executables(
+        package_name='', executable_names=['foo', 'bar', 'fizz']
+    )
+    nodes = {node.executable: node for node in nodes}
+
+    assert 'foo' in nodes and 'bar' in nodes and len(nodes.keys()) == 2
+    assert missing[0] == 'fizz'

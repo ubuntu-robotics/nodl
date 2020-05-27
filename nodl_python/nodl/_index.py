@@ -12,7 +12,7 @@
 
 
 from pathlib import Path
-from typing import List
+from typing import Iterable, List, Tuple
 
 from ament_index_python.packages import get_package_share_directory
 
@@ -22,9 +22,7 @@ from nodl.errors import ExecutableNotFoundError, NoNoDLFilesError
 from .types import Node
 
 
-def _get_nodl_xml_files_in_path(*, path: Path) -> List[Path]:
-    """Return all files with NoDL extension (.nodl.xml) in a path."""
-    return sorted(path.rglob('*.nodl.xml'))
+_FILE_EXTENSION = '.nodl.xml'
 
 
 def _get_nodl_files_from_package_share(*, package_name: str) -> List[Path]:
@@ -34,7 +32,9 @@ def _get_nodl_files_from_package_share(*, package_name: str) -> List[Path]:
     :raises NoNoDLFilesError: if no .nodl.xml files are in package share directory
     """
     package_share_directory = Path(get_package_share_directory(package_name))
-    nodl_paths = _get_nodl_xml_files_in_path(path=package_share_directory)
+    nodl_paths = [
+        path for path in package_share_directory.glob('*' + _FILE_EXTENSION) if path.is_file()
+    ]
     if not nodl_paths:
         raise NoNoDLFilesError(package_name)
     return nodl_paths
@@ -65,7 +65,24 @@ def get_node_by_executable(*, package_name: str, executable_name: str) -> Node:
     """
     nodes = _get_nodes_from_package(package_name=package_name)
     try:
-        result = next(node for node in nodes if node.executable == executable_name)
+        return next(node for node in nodes if node.executable == executable_name)
     except StopIteration:
         raise ExecutableNotFoundError(package_name=package_name, executable_name=executable_name)
-    return result
+
+
+def _get_nodes_by_executables(
+    *, package_name: str, executable_names: Iterable[str]
+) -> Tuple[List[Node], List[str]]:
+    """Return nodes associated with given executables from a package's exported nodl.
+
+    :param package_name: name of the package to search in
+    :type package_name: str
+    :param executable_names: the names of the executables the nodes are associated with
+    :type executable_names: Iterable[str]
+    :return: Tuple containing nodes with matching executable field, unmatched nodes
+    :rtype: Tuple[List[Node], List[Node]]
+    """
+    nodes = _get_nodes_from_package(package_name=package_name)
+    result = {node.executable: node for node in nodes if node.executable in executable_names}
+    missing = list(set(executable_names) - result.keys())
+    return list(result.values()), missing
