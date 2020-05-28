@@ -45,7 +45,7 @@ class _ValidateVerb(VerbExtension):
         else:
             paths = list(Path.cwd().glob('*' + _FILE_EXTENSION))
         if not paths:
-            print(f'No files to validate', sys.stderr)
+            print('No files to validate', file=sys.stderr)
             return 1
 
         for path in paths:
@@ -60,10 +60,10 @@ class _ValidateVerb(VerbExtension):
                 print(f'Failed to parse {path}', file=sys.stderr)
                 print(e, file=sys.stderr)
                 return 1
-            print(f'  Success')
+            print('  Success')
             if args.print:
                 for node in nodes:
                     pprint.pprint(node._as_dict, width=shutil.get_terminal_size()[0])
 
-        print(f'All files validated')
+        print('All files validated')
         return 0
