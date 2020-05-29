@@ -34,7 +34,7 @@ jobs:
         uses: ros-tooling/action-ros-ci@0.0.16
         id: action_ros_ci_step
         with:
-          package-name: nodl_python
+          package-name: nodl_python ros2nodl
 
       - name: Upload Logs
         uses: actions/upload-artifact@v1
@@ -50,11 +50,13 @@ jobs:
     steps:
       - name: Setup ROS2
         uses: ros-tooling/setup-ros@2c05014
+
       - name: Run Tests
         uses: ros-tooling/action-ros-ci@0.0.16
         id: action_ros_ci_step
         with:
-          package-name: nodl_python
+          package-name: nodl_python ros2nodl
+
       - name: Upload Logs
         uses: actions/upload-artifact@v1
         with:
