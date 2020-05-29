@@ -7,8 +7,6 @@
   <maintainer email="ubuntu-robotics@lists.launchpad.net">Ubuntu Robotics</maintainer>
   <license>GPLv3</license>
 
-  <buildtool_depend>ament_python</buildtool_depend>
-
   <depend>ament_index_python</depend>
   <depend>argcomplete</depend>
   <depend>nodl_python</depend>
