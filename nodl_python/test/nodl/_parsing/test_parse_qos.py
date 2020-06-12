@@ -20,7 +20,7 @@ from rclpy import qos
 
 def test__parse_qos():
     # Test that qos requires at minimum history or depth
-    element = etree.Element('qos')
+    element = etree.Element('qos_profile')
     with pytest.raises(errors.InvalidQosProfileError):
         nodl._parsing._v1._qos._parse_qos(element)
 

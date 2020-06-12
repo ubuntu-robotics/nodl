@@ -1,25 +1,27 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-    <xs:element name="qos">
-        <xs:complexType>
-            <xs:attribute name="history" type="xs:string"/>
-            <xs:attribute name="reliability" type="xs:string"/>
-            <xs:attribute name="durability" type="xs:string"/>
-            <xs:attribute name="depth" type="xs:integer"/>
-            <xs:attribute name="lifespan" type="xs:decimal"/>
-            <xs:attribute name="deadline" type="xs:decimal"/>
-            <xs:attribute name="liveliness" type="xs:string"/>
-            <xs:attribute name="liveliness_lease_duration" type="xs:decimal"/>
-            <xs:attribute name="avoid_ros_namespace_conventions" type="xs:boolean"/>
-        </xs:complexType>
-    </xs:element>
+    <xs:complexType name="qos_type">
+        <xs:attribute name="history" type="xs:string"/>
+        <xs:attribute name="reliability" type="xs:string"/>
+        <xs:attribute name="durability" type="xs:string"/>
+        <xs:attribute name="depth" type="xs:integer"/>
+        <xs:attribute name="lifespan" type="xs:decimal"/>
+        <xs:attribute name="deadline" type="xs:decimal"/>
+        <xs:attribute name="liveliness" type="xs:string"/>
+        <xs:attribute name="liveliness_lease_duration" type="xs:decimal"/>
+        <xs:attribute name="avoid_ros_namespace_conventions" type="xs:boolean"/>
+    </xs:complexType>
 
     <xs:element name="action">
         <xs:complexType>
-            <xs:sequence>
-                <xs:element ref="qos"/>
-            </xs:sequence>
+            <xs:choice maxOccurs="unbounded" minOccurs="0">
+                <xs:element name="goal_service_qos_profile" type="qos_type"/>
+                <xs:element name="result_service_qos_profile" type="qos_type"/>
+                <xs:element name="cancel_service_qos_profile" type="qos_type"/>
+                <xs:element name="feedback_sub_qos_profile" type="qos_type"/>
+                <xs:element name="status_sub_qos_profile" type="qos_type"/>
+            </xs:choice>
             <xs:attribute name="name" type="xs:string" use="required"/>
             <xs:attribute name="type" type="xs:string" use="required"/>
             <xs:attribute name="server" type="xs:boolean" default="false"/>
@@ -37,7 +39,7 @@
     <xs:element name="service">
         <xs:complexType>
             <xs:sequence>
-                <xs:element ref="qos"/>
+                <xs:element name="qos_profile" type="qos_type" minOccurs="0"/>
             </xs:sequence>
             <xs:attribute name="name" type="xs:string" use="required"/>
             <xs:attribute name="type" type="xs:string" use="required"/>
@@ -49,7 +51,7 @@
     <xs:element name="topic">
         <xs:complexType>
             <xs:sequence>
-                <xs:element ref="qos"/>
+                <xs:element name="qos_profile" type="qos_type"/>
             </xs:sequence>
             <xs:attribute name="name" type="xs:string" use="required"/>
             <xs:attribute name="type" type="xs:string" use="required"/>

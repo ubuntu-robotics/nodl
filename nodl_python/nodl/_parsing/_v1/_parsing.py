@@ -30,9 +30,22 @@ def _parse_action(element: etree._Element) -> Action:
     if not (server or client):
         raise errors.AmbiguousActionInterfaceError(element)
 
-    policy = _parse_qos(element.find('qos'))
+    # List of names of possible elements in the xml doc
+    profile_keys = (
+        'goal_service_qos_profile',
+        'result_service_qos_profile',
+        'cancel_service_qos_profile',
+        'feedback_sub_qos_profile',
+        'status_sub_qos_profile',
+    )
+    profiles = {}
+    for profile in profile_keys:
+        # For each possible element, parse if present and store in profiles dict
+        qos_element = element.find(profile)
+        if qos_element is not None:
+            profiles[profile] = _parse_qos(qos_element)
 
-    return Action(name=name, action_type=action_type, server=server, client=client, qos=policy)
+    return Action(name=name, action_type=action_type, server=server, client=client, **profiles)
 
 
 def _parse_parameter(element: etree._Element) -> Parameter:
@@ -42,17 +55,20 @@ def _parse_parameter(element: etree._Element) -> Parameter:
 
 def _parse_service(element: etree._Element) -> Service:
     """Parse a NoDL service from an xml element."""
-    name = element.get('name')
-    service_type = element.get('type')
+    args = {}
+    args['name'] = element.get('name')
+    args['service_type'] = element.get('type')
 
-    server = get_bool_attribute(element, 'server')
-    client = get_bool_attribute(element, 'client')
-    if not (server or client):
+    args['server'] = get_bool_attribute(element, 'server')
+    args['client'] = get_bool_attribute(element, 'client')
+    if not (args['server'] or args['client']):
         raise errors.AmbiguousServiceInterfaceError(element)
 
-    policy = _parse_qos(element.find('qos'))
+    qos_element = element.find('qos_profile')
+    if qos_element is not None:
+        args['qos_profile'] = _parse_qos(qos_element)
 
-    return Service(name=name, service_type=service_type, server=server, client=client, qos=policy,)
+    return Service(**args)
 
 
 def _parse_topic(element: etree._Element) -> Topic:
@@ -65,14 +81,14 @@ def _parse_topic(element: etree._Element) -> Topic:
     if not (publisher or subscription):
         raise errors.AmbiguousTopicInterfaceError(element)
 
-    policy = _parse_qos(element.find('qos'))
+    policy = _parse_qos(element.find('qos_profile'))
 
     return Topic(
         name=name,
         message_type=message_type,
         publisher=publisher,
         subscription=subscription,
-        qos=policy,
+        qos_profile=policy,
     )
 
 
@@ -95,11 +111,11 @@ def _parse_node(node: etree._Element) -> Node:
     for child in node:
         if child.tag == 'action':
             actions.append(_parse_action(child))
-        if child.tag == 'parameter':
+        elif child.tag == 'parameter':
             parameters.append(_parse_parameter(child))
-        if child.tag == 'service':
+        elif child.tag == 'service':
             services.append(_parse_service(child))
-        if child.tag == 'topic':
+        elif child.tag == 'topic':
             topics.append(_parse_topic(child))
     return Node(
         name=name,

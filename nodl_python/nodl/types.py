@@ -13,7 +13,7 @@
 from typing import Any, Dict, List, Optional
 
 from nodl._util import qos_to_dict
-from rclpy.qos import QoSPresetProfiles, QoSProfile
+import rclpy.qos
 
 
 class NoDLData:
@@ -28,8 +28,9 @@ class NoDLData:
     @property
     def _as_dict(self) -> Dict:
         self_dict = self.__dict__.copy()
-        if 'qos' in self_dict:
-            self_dict['qos'] = qos_to_dict(self_dict['qos'])
+        for key in self_dict.keys():
+            if 'qos_profile' in key:
+                self_dict[key] = qos_to_dict(self_dict[key])
         return self_dict
 
 
@@ -56,13 +57,21 @@ class Action(NoDLInterface):
         action_type: str,
         server: bool = False,
         client: bool = False,
-        qos: QoSProfile = QoSPresetProfiles.ACTION_STATUS_DEFAULT.value
+        goal_service_qos_profile: rclpy.qos.QoSProfile = rclpy.qos.qos_profile_services_default,
+        result_service_qos_profile: rclpy.qos.QoSProfile = rclpy.qos.qos_profile_services_default,
+        cancel_service_qos_profile: rclpy.qos.QoSProfile = rclpy.qos.qos_profile_services_default,
+        feedback_sub_qos_profile: rclpy.qos.QoSProfile = rclpy.qos.QoSProfile(depth=10),
+        status_sub_qos_profile: rclpy.qos.QoSProfile = rclpy.qos.qos_profile_action_status_default
     ) -> None:
         super().__init__(name=name, value_type=action_type)
         self.server = server
         self.client = client
 
-        self.qos = qos
+        self.goal_service_qos_profile = goal_service_qos_profile
+        self.result_service_qos_profile = result_service_qos_profile
+        self.cancel_service_qos_profile = cancel_service_qos_profile
+        self.feedback_sub_qos_profile = feedback_sub_qos_profile
+        self.status_sub_qos_profile = status_sub_qos_profile
 
 
 class Parameter(NoDLInterface):
@@ -82,13 +91,13 @@ class Service(NoDLInterface):
         service_type: str,
         server: bool = False,
         client: bool = False,
-        qos: QoSProfile = QoSPresetProfiles.SERVICES_DEFAULT.value
+        qos_profile: rclpy.qos.QoSProfile = rclpy.qos.qos_profile_services_default
     ) -> None:
         super().__init__(name=name, value_type=service_type)
         self.server = server
         self.client = client
 
-        self.qos = qos
+        self.qos_profile = qos_profile
 
 
 class Topic(NoDLInterface):
@@ -99,15 +108,15 @@ class Topic(NoDLInterface):
         *,
         name: str,
         message_type: str,
+        qos_profile: rclpy.qos.QoSProfile,
         publisher: bool = False,
         subscription: bool = False,
-        qos: QoSProfile = QoSPresetProfiles.SYSTEM_DEFAULT.value
     ) -> None:
         super().__init__(name=name, value_type=message_type)
         self.publisher = publisher
         self.subscription = subscription
 
-        self.qos = qos
+        self.qos_profile = qos_profile
 
 
 class Node(NoDLData):

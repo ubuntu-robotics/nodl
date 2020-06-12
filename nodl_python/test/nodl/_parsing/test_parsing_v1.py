@@ -24,11 +24,13 @@ def valid_nodl(test_nodl_path) -> etree._ElementTree:
     return etree.parse(str(test_nodl_path))
 
 
-def test_parse(valid_nodl):
+def test_parse_minimal():
     # Assert a minimal example passes validation
     element = E.interface(
         E.node(
-            E.action(E.qos(depth='10'), name='bar', type='baz', server='true'),
+            E.action(
+                E.goal_service_qos_profile(depth='10'), name='bar', type='baz', server='true'
+            ),
             name='foo',
             executable='row',
         ),
@@ -36,9 +38,13 @@ def test_parse(valid_nodl):
     )
     assert nodl._parsing._v1.parse(element)
 
+
+def test_parse_valid_example(valid_nodl):
     # Assert example nodl passes validation
     assert nodl._parsing._v1.parse(valid_nodl.getroot())
 
+
+def test_parse_fail_on_empty():
     # Assert empty interface does not pass
     element = E.interface(version='1')
     with pytest.raises(errors.InvalidNoDLDocumentError):
@@ -91,7 +97,7 @@ def test__parse_service():
 
 def test__parse_topic():
     # Test that parse fails when missing name/type
-    element = E.topic(E.qos(depth='10'), name='foo', value_type='bar', publisher='true')
+    element = E.topic(E.qos_profile(depth='10'), name='foo', value_type='bar', publisher='true')
 
     topic = nodl._parsing._v1._parsing._parse_topic(element)
     assert topic.publisher
