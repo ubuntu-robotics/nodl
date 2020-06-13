@@ -115,7 +115,8 @@ def _parse_node(node: etree._Element) -> Node:
             parameters.append(_parse_parameter(child))
         elif child.tag == 'service':
             services.append(_parse_service(child))
-        elif child.tag == 'topic':
+        else:
+            assert child.tag == 'topic'
             topics.append(_parse_topic(child))
     return Node(
         name=name,
