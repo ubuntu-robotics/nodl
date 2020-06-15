@@ -60,8 +60,8 @@ class Action(NoDLInterface):
         goal_service_qos_profile: rclpy.qos.QoSProfile = rclpy.qos.qos_profile_services_default,
         result_service_qos_profile: rclpy.qos.QoSProfile = rclpy.qos.qos_profile_services_default,
         cancel_service_qos_profile: rclpy.qos.QoSProfile = rclpy.qos.qos_profile_services_default,
-        feedback_sub_qos_profile: rclpy.qos.QoSProfile = rclpy.qos.QoSProfile(depth=10),
-        status_sub_qos_profile: rclpy.qos.QoSProfile = rclpy.qos.qos_profile_action_status_default
+        feedback_qos_profile: rclpy.qos.QoSProfile = rclpy.qos.QoSProfile(depth=10),
+        status_qos_profile: rclpy.qos.QoSProfile = rclpy.qos.qos_profile_action_status_default
     ) -> None:
         super().__init__(name=name, value_type=action_type)
         self.server = server
@@ -70,8 +70,8 @@ class Action(NoDLInterface):
         self.goal_service_qos_profile = goal_service_qos_profile
         self.result_service_qos_profile = result_service_qos_profile
         self.cancel_service_qos_profile = cancel_service_qos_profile
-        self.feedback_sub_qos_profile = feedback_sub_qos_profile
-        self.status_sub_qos_profile = status_sub_qos_profile
+        self.feedback_qos_profile = feedback_qos_profile
+        self.status_qos_profile = status_qos_profile
 
 
 class Parameter(NoDLInterface):

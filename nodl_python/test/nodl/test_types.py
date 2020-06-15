@@ -29,8 +29,8 @@ def profile_keys():
         'goal_service_qos_profile',
         'result_service_qos_profile',
         'cancel_service_qos_profile',
-        'feedback_sub_qos_profile',
-        'status_sub_qos_profile',
+        'feedback_qos_profile',
+        'status_qos_profile',
     ]
 
 

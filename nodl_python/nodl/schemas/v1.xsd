@@ -19,8 +19,8 @@
                 <xs:element name="goal_service_qos_profile" type="qos_type"/>
                 <xs:element name="result_service_qos_profile" type="qos_type"/>
                 <xs:element name="cancel_service_qos_profile" type="qos_type"/>
-                <xs:element name="feedback_sub_qos_profile" type="qos_type"/>
-                <xs:element name="status_sub_qos_profile" type="qos_type"/>
+                <xs:element name="feedback_qos_profile" type="qos_type"/>
+                <xs:element name="status_qos_profile" type="qos_type"/>
             </xs:choice>
             <xs:attribute name="name" type="xs:string" use="required"/>
             <xs:attribute name="type" type="xs:string" use="required"/>

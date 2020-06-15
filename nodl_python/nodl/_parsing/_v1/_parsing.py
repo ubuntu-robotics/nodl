@@ -31,12 +31,14 @@ def _parse_action(element: etree._Element) -> Action:
         raise errors.AmbiguousActionInterfaceError(element)
 
     # List of names of possible elements in the xml doc
+    #   Derived from fields of rclpy.action.Action(Client, Server)
+    #   feedback and status have their pub/sub field stripped
     profile_keys = (
         'goal_service_qos_profile',
         'result_service_qos_profile',
         'cancel_service_qos_profile',
-        'feedback_sub_qos_profile',
-        'status_sub_qos_profile',
+        'feedback_qos_profile',
+        'status_qos_profile',
     )
     profiles = {}
     for profile in profile_keys:
@@ -115,9 +117,10 @@ def _parse_node(node: etree._Element) -> Node:
             parameters.append(_parse_parameter(child))
         elif child.tag == 'service':
             services.append(_parse_service(child))
-        else:
-            assert child.tag == 'topic'
+        elif child.tag == 'topic':
             topics.append(_parse_topic(child))
+        else:
+            raise errors.InvalidElementError(f'Node {name} has invalid child {child.tag}.', node)
     return Node(
         name=name,
         executable=executable,
