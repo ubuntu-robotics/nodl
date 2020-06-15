@@ -116,6 +116,12 @@ def test__parse_node(valid_nodl: etree._ElementTree):
     assert node.actions and node.parameters and node.services and node.topics
 
 
+def test__parse_node_invalid_child():
+    node = E.node(E.baz(), name='foo', executable='bar')
+    with pytest.raises(errors.InvalidElementError):
+        nodl._parsing._v1._parsing._parse_node(node)
+
+
 def test__parse_nodes(valid_nodl: etree._ElementTree):
     nodes = nodl._parsing._v1._parsing._parse_nodes(valid_nodl.getroot())
     assert len(nodes) == 2
