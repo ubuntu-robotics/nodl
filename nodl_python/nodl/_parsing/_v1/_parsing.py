@@ -65,9 +65,9 @@ def _parse_service(element: etree._Element) -> Service:
     if not (server or client):
         raise errors.AmbiguousServiceInterfaceError(element)
 
-    qos_element = element.find('qos_policy')
+    qos_element = element.find('qos_profile')
     qos_args = {}
-    if qos_element:
+    if qos_element is not None:
         qos_args['qos_profile'] = _parse_qos(qos_element)
 
     return Service(
@@ -122,7 +122,7 @@ def _parse_node(node: etree._Element) -> Node:
         elif child.tag == 'topic':
             topics.append(_parse_topic(child))
         else:
-            raise errors.InvalidElementError(f'Node {name} has invalid child {child.tag}.', node)
+            raise errors.InvalidNodeChildError(child)
     return Node(
         name=name,
         executable=executable,

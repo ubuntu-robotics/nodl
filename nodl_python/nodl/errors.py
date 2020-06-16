@@ -144,6 +144,15 @@ class AmbiguousServiceInterfaceError(InvalidServiceError):
         )
 
 
+class InvalidNodeChildError(InvalidElementError):
+    """Error raised when a node has a child with an unsupported tag."""
+
+    def __init__(self, element: etree._Element) -> None:
+        super().__init__(
+            f'Tag {element.tag} is not a valid child of a Node', element
+        )
+
+
 class UnsupportedInterfaceError(InvalidNoDLError):
     """Error raised when an interface has a future or invalid version."""
 

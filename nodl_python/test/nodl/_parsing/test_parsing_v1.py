@@ -52,7 +52,7 @@ def test_parse_fail_on_empty():
 
 
 def test__parse_action():
-    element = E.action(E.qos(depth='10'), name='foo', value_type='bar', server='true')
+    element = E.action(name='foo', value_type='bar', server='true')
 
     # Test that actions get parsed
     action = nodl._parsing._v1._parsing._parse_action(element)
@@ -79,8 +79,7 @@ def test__parse_parameter():
 
 
 def test__parse_service():
-    # Test that parse fails when missing name/type
-    element = E.service(E.qos(depth='10'), name='foo', value_type='bar', server='true')
+    element = E.service(name='foo', value_type='bar', server='true')
 
     # Test that services get parsed
     service = nodl._parsing._v1._parsing._parse_service(element)
@@ -88,6 +87,9 @@ def test__parse_service():
     assert service.server
     # Test that bools have default values
     assert not service.client
+    # Test that accepts qos profile
+    element.append(E.qos_profile(depth='10'))
+    assert nodl._parsing._v1._parsing._parse_service(element)
 
     # Test that warning is emitted when both bools are false
     element.attrib['server'] = 'False'
@@ -96,7 +98,6 @@ def test__parse_service():
 
 
 def test__parse_topic():
-    # Test that parse fails when missing name/type
     element = E.topic(E.qos_profile(depth='10'), name='foo', value_type='bar', publisher='true')
 
     topic = nodl._parsing._v1._parsing._parse_topic(element)
@@ -118,7 +119,7 @@ def test__parse_node(valid_nodl: etree._ElementTree):
 
 def test__parse_node_invalid_child():
     node = E.node(E.baz(), name='foo', executable='bar')
-    with pytest.raises(errors.InvalidElementError):
+    with pytest.raises(errors.InvalidNodeChildError):
         nodl._parsing._v1._parsing._parse_node(node)
 
 
