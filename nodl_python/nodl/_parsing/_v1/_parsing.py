@@ -57,20 +57,22 @@ def _parse_parameter(element: etree._Element) -> Parameter:
 
 def _parse_service(element: etree._Element) -> Service:
     """Parse a NoDL service from an xml element."""
-    args = {}
-    args['name'] = element.get('name')
-    args['service_type'] = element.get('type')
+    name = element.get('name')
+    service_type = element.get('type')
 
-    args['server'] = get_bool_attribute(element, 'server')
-    args['client'] = get_bool_attribute(element, 'client')
-    if not (args['server'] or args['client']):
+    server = get_bool_attribute(element, 'server')
+    client = get_bool_attribute(element, 'client')
+    if not (server or client):
         raise errors.AmbiguousServiceInterfaceError(element)
 
-    qos_element = element.find('qos_profile')
-    if qos_element is not None:
-        args['qos_profile'] = _parse_qos(qos_element)
+    qos_element = element.find('qos_policy')
+    qos_args = {}
+    if qos_element:
+        qos_args['qos_profile'] = _parse_qos(qos_element)
 
-    return Service(**args)
+    return Service(
+        name=name, service_type=service_type, server=server, client=client, **qos_args,
+    )
 
 
 def _parse_topic(element: etree._Element) -> Topic:
