@@ -30,11 +30,13 @@ jobs:
         run: |
           pip3 install lxml
 
-      - name: Run Tests
+      - name: Test nodl
         uses: ros-tooling/action-ros-ci@0.0.16
         id: action_ros_ci_step
         with:
           package-name: nodl_python ros2nodl
+          colcon-mixin-name: coverage-pytest
+          colcon-mixin-repository: https://raw.githubusercontent.com/colcon/colcon-mixin-repository/5c45b95018788deff62202aaa831ad4c20ebe2c6/index.yaml
 
       - name: Upload Logs
         uses: actions/upload-artifact@v1
@@ -46,21 +48,52 @@ jobs:
   build-docker:
     runs-on: ubuntu-latest
     container:
-      image: ubuntu:focal
+      image: osrf/ros2:nightly
     steps:
-      - name: Setup ROS2
-        uses: ros-tooling/setup-ros@2c05014
+      - name: prep
+        run: |
+          apt-get -qq update
+          apt-get -qq upgrade -y
+          apt-get -qq install -y curl libasio-dev libtinyxml2-dev
+          colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml
+          colcon mixin update default
+          mkdir -p src
+
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          path: src/
+
+      - run: cp src/codecov.yml .
+
+      - name: Rosdep
+        run: DEBIAN_FRONTEND=noninteractive rosdep install -r --from-paths src --ignore-src --rosdistro foxy -y || true
+
+      - name: Build
+        run: . /opt/ros/$ROS_DISTRO/setup.sh && colcon build --event-handlers console_cohesion+ --mixin coverage-pytest --packages-select nodl_python ros2nodl --merge-install
 
       - name: Run Tests
-        uses: ros-tooling/action-ros-ci@0.0.16
         id: action_ros_ci_step
+        run: . /opt/ros/$ROS_DISTRO/setup.sh && colcon test --merge-install --mixin coverage-pytest --packages-select nodl_python ros2nodl
+
+      - uses: codecov/codecov-action@v1
         with:
-          package-name: nodl_python ros2nodl
+          file: build/nodl_python/coverage.xml
+          fail_ci_if_error: true
+          flags: unittests
+          name: codecov-nodl_python
+
+      - uses: codecov/codecov-action@v1
+        with:
+          file: build/ros2nodl/coverage.xml
+          fail_ci_if_error: true
+          flags: unittests
+          name: codecov-ros2nodl
 
       - name: Upload Logs
         uses: actions/upload-artifact@v1
         with:
           name: colcon-logs
-          path: ${{ steps.action_ros_ci_step.outputs.ros-workspace-directory-name }}/log
+          path: log/
         if: always()
 
