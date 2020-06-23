@@ -55,7 +55,7 @@ jobs:
           apt-get -qq update
           apt-get -qq upgrade -y
           apt-get -qq install -y curl libasio-dev libtinyxml2-dev
-          colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/master/index.yaml
+          colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/5c45b95018788deff62202aaa831ad4c20ebe2c6/index.yaml
           colcon mixin update default
           mkdir -p src
 
