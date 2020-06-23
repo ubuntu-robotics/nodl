@@ -5,7 +5,7 @@
             <xs:choice maxOccurs="unbounded">
                 <xs:element name="node"></xs:element>
             </xs:choice>
-            <xs:attribute name="version" type="xs:positiveInteger" use="required"/>
+            <xs:attribute name="version" type="xs:positiveInteger" use="required" />
         </xs:complexType>
     </xs:element>
 </xs:schema>
