@@ -41,7 +41,7 @@ jobs:
       - name: Upload Logs
         uses: actions/upload-artifact@v1
         with:
-          name: colcon-logs
+          name: colcon-logs-macwin
           path: ${{ steps.action_ros_ci_step.outputs.ros-workspace-directory-name }}/log
         if: always()
 
@@ -80,20 +80,20 @@ jobs:
         with:
           file: build/nodl_python/coverage.xml
           fail_ci_if_error: true
-          flags: unittests
+          flags: unittests,nodl_python
           name: codecov-nodl_python
 
       - uses: codecov/codecov-action@v1
         with:
           file: build/ros2nodl/coverage.xml
           fail_ci_if_error: true
-          flags: unittests
+          flags: unittests,ros2nodl
           name: codecov-ros2nodl
 
       - name: Upload Logs
         uses: actions/upload-artifact@v1
         with:
-          name: colcon-logs
+          name: colcon-logs-nux
           path: log/
         if: always()
 
