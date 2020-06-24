@@ -74,7 +74,7 @@ jobs:
 
       - name: Run Tests
         id: action_ros_ci_step
-        run: . /opt/ros/$ROS_DISTRO/setup.sh && colcon test --merge-install --mixin coverage-pytest --packages-select nodl_python ros2nodl
+        run: . /opt/ros/$ROS_DISTRO/setup.sh && colcon test --merge-install --mixin coverage-pytest --packages-select nodl_python ros2nodl --return-code-on-test-failure --event-handlers console_cohesion+
 
       - uses: codecov/codecov-action@v1
         with:
