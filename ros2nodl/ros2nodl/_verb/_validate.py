@@ -63,7 +63,7 @@ class _ValidateVerb(VerbExtension):
             print('  Success')
             if args.print:
                 for node in nodes:
-                    pprint.pprint(node._as_dict, width=shutil.get_terminal_size()[0])
+                    pprint.pprint(node, width=shutil.get_terminal_size()[0])
 
         print('All files validated')
         return 0
