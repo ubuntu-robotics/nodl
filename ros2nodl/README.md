@@ -44,7 +44,6 @@ $ ros2 nodl show examples_rclcpp_minimal_publisher publisher_lambda
  'services': [],
  'topics': [{'name': 'topic',
              'publisher': True,
-             'qos': {'avoid_ros_namespace_conventions': False, 'deadline': 0, 'depth': 10, 'durability': 'volatile', 'history': 'keep_last', 'lifespan': 0, 'liveliness': 'system_default', 'liveliness_lease_duration': 0, 'reliability': 'reliable'},
              'subscription': False,
              'type': 'std_msgs/msg/String'}]}
 ```

@@ -11,7 +11,6 @@
 # this program. If not, see <http://www.gnu.org/licenses/>.
 
 from lxml import etree
-import rclpy.qos
 
 from .types import Node
 
@@ -51,9 +50,7 @@ class InvalidXMLError(InvalidNoDLError):
     """Error raised when unable to parse XML."""
 
     def __init__(self, err: etree.XMLSyntaxError):
-        super().__init__(
-            f'XML syntax error: {err.filename}: {err.msg}'
-        )
+        super().__init__(f'XML syntax error: {err.filename}: {err.msg}')
 
 
 class InvalidNoDLDocumentError(InvalidNoDLError):
@@ -76,29 +73,6 @@ class InvalidElementError(InvalidNoDLError):
             + message
         )
         self.element = element
-
-
-class InvalidQoSError(InvalidElementError):
-    """Base class for all errors in parsing a QoS element."""
-
-
-class InvalidQosProfileError(InvalidQoSError):
-    """Error raised when rclpy does not accept QoSProfile constructor arguments."""
-
-    def __init__(
-        self, error: 'rclpy.qos.InvalidQoSProfileException', element: etree._Element
-    ) -> None:
-        super().__init__(str(error), element)
-
-
-class InvalidQOSAttributeValueError(InvalidQoSError):
-    """Error raised for values out of enum in QoS."""
-
-    def __init__(self, attribute: str, element: etree._Element) -> None:
-        super().__init__(
-            f'Value: {element.get(attribute)} is not valid for attribute {attribute}', element
-        )
-        self.attribute = attribute
 
 
 class InvalidActionError(InvalidElementError):
@@ -141,6 +115,19 @@ class AmbiguousServiceInterfaceError(InvalidServiceError):
     def __init__(self, element: etree._Element) -> None:
         super().__init__(
             f'Service <{element.get("name")}> is neither server nor client', element=element
+        )
+
+
+class InvalidNodeChildError(InvalidElementError):
+    """Error raised when a node has a child with an unsupported tag."""
+
+    def __init__(self, element: etree._Element) -> None:
+        super().__init__(
+            (
+                f'Nodes cannot contain {element.tag},'
+                'must be one of (Action, Parameter, Service, Topic)'
+            ),
+            element,
         )
 
 

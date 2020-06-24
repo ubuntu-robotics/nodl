@@ -65,5 +65,5 @@ class _ShowVerb(VerbExtension):
                 return 1
 
         for node in nodes_to_show:
-            pprint.pprint(node._as_dict, width=shutil.get_terminal_size()[0])
+            pprint.pprint(node, width=shutil.get_terminal_size()[0])
         return 0
