@@ -10,5 +10,5 @@
 # You should have received a copy of the GNU Limited General Public License along with
 # this program. If not, see <http://www.gnu.org/licenses/>.
 
-# importlib does not support subdirectories, so schemas must be an (empty) module.
+# importlib does not support subdirectories, so schemas must be in a package.
 # Will change in python 3.9

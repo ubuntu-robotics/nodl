@@ -34,5 +34,5 @@ def v1_schema() -> etree.XMLSchema:
 
 
 def _get_schema(name: str) -> etree.XMLSchema:
-    with importlib.resources.path('nodl.schemas', name) as path:
+    with importlib.resources.path('nodl._schemas', name) as path:
         return etree.XMLSchema(file=str(path))

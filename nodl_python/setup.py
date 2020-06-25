@@ -26,5 +26,5 @@ setup(
     description='Implementation of the NoDL API in Python.',
     license='GNU Limited General Public License v3',
     tests_require=['pytest'],
-    package_data={'nodl': ['schemas/*.xsd']},
+    package_data={'nodl': ['_schemas/*.xsd']},
 )
