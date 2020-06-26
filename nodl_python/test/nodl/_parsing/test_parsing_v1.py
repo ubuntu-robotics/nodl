@@ -24,11 +24,11 @@ def valid_nodl(test_nodl_path) -> etree._ElementTree:
     return etree.parse(str(test_nodl_path))
 
 
-def test_parse(valid_nodl):
+def test_parse_minimal():
     # Assert a minimal example passes validation
     element = E.interface(
         E.node(
-            E.action(E.qos(depth='10'), name='bar', type='baz', server='true'),
+            E.action(name='bar', type='baz', server='true'),
             name='foo',
             executable='row',
         ),
@@ -36,9 +36,13 @@ def test_parse(valid_nodl):
     )
     assert nodl._parsing._v1.parse(element)
 
+
+def test_parse_valid_example(valid_nodl):
     # Assert example nodl passes validation
     assert nodl._parsing._v1.parse(valid_nodl.getroot())
 
+
+def test_parse_fail_on_empty():
     # Assert empty interface does not pass
     element = E.interface(version='1')
     with pytest.raises(errors.InvalidNoDLDocumentError):
@@ -46,7 +50,7 @@ def test_parse(valid_nodl):
 
 
 def test__parse_action():
-    element = E.action(E.qos(depth='10'), name='foo', value_type='bar', server='true')
+    element = E.action(name='foo', value_type='bar', server='true')
 
     # Test that actions get parsed
     action = nodl._parsing._v1._parsing._parse_action(element)
@@ -62,11 +66,9 @@ def test__parse_action():
 
 
 def test__parse_parameter():
-    element = E.parameter()
+    element = E.parameter(name='foo', type='bar')
 
     # Test that parse is successful
-    element.set('name', 'foo')
-    element.set('type', 'bar')
     assert type(nodl._parsing._v1._parsing._parse_parameter(element)) is nodl.types.Parameter
     assert element.get('name') == 'foo'
     assert element.get('type') == 'bar'
@@ -74,7 +76,7 @@ def test__parse_parameter():
 
 def test__parse_service():
     # Test that parse fails when missing name/type
-    element = E.service(E.qos(depth='10'), name='foo', value_type='bar', server='true')
+    element = E.service(name='foo', value_type='bar', server='true')
 
     # Test that services get parsed
     service = nodl._parsing._v1._parsing._parse_service(element)
@@ -91,7 +93,7 @@ def test__parse_service():
 
 def test__parse_topic():
     # Test that parse fails when missing name/type
-    element = E.topic(E.qos(depth='10'), name='foo', value_type='bar', publisher='true')
+    element = E.topic(name='foo', value_type='bar', publisher='true')
 
     topic = nodl._parsing._v1._parsing._parse_topic(element)
     assert topic.publisher
@@ -108,6 +110,12 @@ def test__parse_node(valid_nodl: etree._ElementTree):
     nodes = valid_nodl.findall('node')
     node = nodl._parsing._v1._parsing._parse_node(nodes[1])
     assert node.actions and node.parameters and node.services and node.topics
+
+
+def test__parse_node_invalid_child():
+    node = E.node(E.baz(), name='foo', executable='bar')
+    with pytest.raises(errors.InvalidNodeChildError):
+        nodl._parsing._v1._parsing._parse_node(node)
 
 
 def test__parse_nodes(valid_nodl: etree._ElementTree):

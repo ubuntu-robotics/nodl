@@ -7,8 +7,6 @@
   <maintainer email="ubuntu-robotics@lists.launchpad.net">Ubuntu Robotics</maintainer>
   <license>LGPLv3</license>
 
-  <depend>rclpy</depend>
-
   <depend>ament_index_python</depend>
   <depend>python3-lxml</depend>
 
