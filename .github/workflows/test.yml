@@ -93,7 +93,6 @@ jobs:
       - name: Upload Logs
         uses: actions/upload-artifact@v1
         with:
-          name: colcon-logs-nux
+          name: colcon-logs-linux
           path: log/
         if: always()
-
