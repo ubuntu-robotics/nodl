@@ -10,7 +10,22 @@
 # You should have received a copy of the GNU Limited General Public License along with
 # this program. If not, see <http://www.gnu.org/licenses/>.
 
-from typing import Any, List, Optional
+from enum import Enum, unique
+from typing import Any, List, Optional, Union
+
+
+@unique
+class PubSubRole(Enum):
+    PUBLISHER = 'publisher'
+    SUBSCRIPTION = 'subscription'
+    BOTH = 'both'
+
+
+@unique
+class ServerClientRole(Enum):
+    SERVER = 'server'
+    CLIENT = 'client'
+    BOTH = 'both'
 
 
 class NoDLData:
@@ -38,20 +53,22 @@ class NoDLInterface(NoDLData):
         )
 
 
-class Action(NoDLInterface):
+class _NoDLInterfaceWithRole(NoDLInterface):
+    """ABC providing role to interfaces."""
+
+    def __init__(self, *, name: str, value_type: str, role: Union[PubSubRole, ServerClientRole]):
+        super().__init__(name=name, value_type=value_type)
+        self.role = role
+
+    def __eq__(self, other: Any):
+        return super().__eq__(other) and self.role == other.role
+
+
+class Action(_NoDLInterfaceWithRole):
     """Data structure for action entries in NoDL."""
 
-    def __init__(
-        self, *, name: str, action_type: str, server: bool = False, client: bool = False,
-    ):
-        super().__init__(name=name, value_type=action_type)
-        self.server = server
-        self.client = client
-
-    def __eq__(self, other: Any) -> bool:
-        return (
-            super().__eq__(other) and self.client == other.client and self.server == other.server
-        )
+    def __init__(self, *, name: str, action_type: str, role: ServerClientRole) -> None:
+        super().__init__(name=name, value_type=action_type, role=role)
 
 
 class Parameter(NoDLInterface):
@@ -61,38 +78,18 @@ class Parameter(NoDLInterface):
         super().__init__(name=name, value_type=parameter_type)
 
 
-class Service(NoDLInterface):
+class Service(_NoDLInterfaceWithRole):
     """Data structure for service entries in NoDL."""
 
-    def __init__(
-        self, *, name: str, service_type: str, server: bool = False, client: bool = False,
-    ):
-        super().__init__(name=name, value_type=service_type)
-        self.server = server
-        self.client = client
-
-    def __eq__(self, other: Any) -> bool:
-        return (
-            super().__eq__(other) and self.client == other.client and self.server == other.server
-        )
+    def __init__(self, *, name: str, service_type: str, role: ServerClientRole,) -> None:
+        super().__init__(name=name, value_type=service_type, role=role)
 
 
-class Topic(NoDLInterface):
+class Topic(_NoDLInterfaceWithRole):
     """Data structure for topic entries in NoDL."""
 
-    def __init__(
-        self, *, name: str, message_type: str, publisher: bool = False, subscription: bool = False,
-    ):
-        super().__init__(name=name, value_type=message_type)
-        self.publisher = publisher
-        self.subscription = subscription
-
-    def __eq__(self, other: Any) -> bool:
-        return (
-            super().__eq__(other)
-            and self.subscription == other.subscription
-            and self.subscription == other.subscription
-        )
+    def __init__(self, *, name: str, message_type: str, role: PubSubRole,) -> None:
+        super().__init__(name=name, value_type=message_type, role=role)
 
 
 class Node(NoDLData):

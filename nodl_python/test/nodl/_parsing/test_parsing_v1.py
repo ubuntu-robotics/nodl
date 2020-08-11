@@ -28,9 +28,7 @@ def test_parse_minimal():
     # Assert a minimal example passes validation
     element = E.interface(
         E.node(
-            E.action(name='bar', type='baz', server='true'),
-            name='foo',
-            executable='row',
+            E.action(name='bar', type='baz', role='server'), name='foo', executable='row',
         ),
         version='1',
     )
@@ -50,19 +48,12 @@ def test_parse_fail_on_empty():
 
 
 def test__parse_action():
-    element = E.action(name='foo', value_type='bar', server='true')
+    element = E.action(name='foo', value_type='bar', role='server')
 
     # Test that actions get parsed
     action = nodl._parsing._v1._parsing._parse_action(element)
     assert type(action) is nodl.types.Action
-    assert action.server
-    # Test that bools have default values
-    assert not action.client
-
-    # Test that warning is emitted when both bools are false
-    element.attrib['server'] = 'False'
-    with pytest.raises(errors.AmbiguousActionInterfaceError):
-        nodl._parsing._v1._parsing._parse_action(element)
+    assert action.role == nodl.types.ServerClientRole.SERVER
 
 
 def test__parse_parameter():
@@ -75,35 +66,19 @@ def test__parse_parameter():
 
 
 def test__parse_service():
-    # Test that parse fails when missing name/type
-    element = E.service(name='foo', value_type='bar', server='true')
+    element = E.service(name='foo', value_type='bar', role='server')
 
     # Test that services get parsed
     service = nodl._parsing._v1._parsing._parse_service(element)
     assert type(service) is nodl.types.Service
-    assert service.server
-    # Test that bools have default values
-    assert not service.client
-
-    # Test that warning is emitted when both bools are false
-    element.attrib['server'] = 'False'
-    with pytest.raises(errors.AmbiguousServiceInterfaceError):
-        nodl._parsing._v1._parsing._parse_service(element)
+    assert service.role == nodl.types.ServerClientRole.SERVER
 
 
 def test__parse_topic():
-    # Test that parse fails when missing name/type
-    element = E.topic(name='foo', value_type='bar', publisher='true')
+    element = E.topic(name='foo', value_type='bar', role='publisher')
 
     topic = nodl._parsing._v1._parsing._parse_topic(element)
-    assert topic.publisher
-    # Test that bools have default values
-    assert not topic.subscription
-
-    # Test that warning is emitted when both bools are false
-    element.set('publisher', 'false')
-    with pytest.raises(errors.AmbiguousTopicInterfaceError):
-        nodl._parsing._v1._parsing._parse_topic(element)
+    assert topic.role == nodl.types.PubSubRole.PUBLISHER
 
 
 def test__parse_node(valid_nodl: etree._ElementTree):

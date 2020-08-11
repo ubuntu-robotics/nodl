@@ -79,15 +79,6 @@ class InvalidActionError(InvalidElementError):
     """Base class for all errors in parsing an action."""
 
 
-class AmbiguousActionInterfaceError(InvalidActionError):
-    """Error raised when an action has no interface exposed."""
-
-    def __init__(self, element: etree._Element) -> None:
-        super().__init__(
-            f'Action <{element.get("name")}> is neither server nor client', element=element
-        )
-
-
 class InvalidParameterError(InvalidElementError):
     """Base class for all errors in parsing a parameter."""
 
@@ -96,26 +87,8 @@ class InvalidTopicError(InvalidElementError):
     """Base class for all errors in parsing a topic."""
 
 
-class AmbiguousTopicInterfaceError(InvalidTopicError):
-    """Error raised when a topic has no interface exposed."""
-
-    def __init__(self, element: etree._Element) -> None:
-        super().__init__(
-            f'Topic <{element.get("name")}> is neither publisher nor subscription', element=element
-        )
-
-
 class InvalidServiceError(InvalidElementError):
     """Base class for all errors in parsing a service."""
-
-
-class AmbiguousServiceInterfaceError(InvalidServiceError):
-    """Error raised when a topic has no interface exposed."""
-
-    def __init__(self, element: etree._Element) -> None:
-        super().__init__(
-            f'Service <{element.get("name")}> is neither server nor client', element=element
-        )
 
 
 class InvalidNodeChildError(InvalidElementError):
