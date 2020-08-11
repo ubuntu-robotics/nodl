@@ -17,14 +17,16 @@ import pytest
 
 @pytest.fixture
 def topic_publisher():
-    return nodl.types.Topic(name='foo', message_type='bar', publisher=True)
+    return nodl.types.Topic(name='foo', message_type='bar', role=nodl.types.PubSubRole.PUBLISHER)
 
 
 def test_action():
-    action_server = nodl.types.Action(name='foo', action_type='bar', server=True)
+    action_server = nodl.types.Action(
+        name='foo', action_type='bar', role=nodl.types.ServerClientRole.SERVER
+    )
     assert action_server.name == 'foo'
     assert action_server.type == 'bar'
-    assert action_server.server
+    assert action_server.role == nodl.types.ServerClientRole.SERVER
 
 
 def test_parameter():
@@ -34,16 +36,29 @@ def test_parameter():
 
 
 def test_service():
-    service_client = nodl.types.Service(name='foo', service_type='bar', client=True)
-    assert service_client.name == 'foo'
-    assert service_client.type == 'bar'
-    assert service_client.client
+    service = nodl.types.Service(
+        name='foo', service_type='bar', role=nodl.types.ServerClientRole.CLIENT
+    )
+    assert service.name == 'foo'
+    assert service.type == 'bar'
+    assert service.role == nodl.types.ServerClientRole.CLIENT
+
+    service = nodl.types.Service(
+        name='foo', service_type='bar', role=nodl.types.ServerClientRole.SERVER,
+    )
+    assert service.role == nodl.types.ServerClientRole.SERVER
 
 
-def test_topic(topic_publisher):
-    assert topic_publisher.name == 'foo'
-    assert topic_publisher.type == 'bar'
-    assert topic_publisher.publisher
+def test_topic():
+    topic = nodl.types.Topic(name='foo', message_type='bar', role=nodl.types.PubSubRole.PUBLISHER,)
+    assert topic.name == 'foo'
+    assert topic.type == 'bar'
+    assert topic.role == nodl.types.PubSubRole.PUBLISHER
+
+    topic = nodl.types.Topic(
+        name='foo', message_type='bar', role=nodl.types.PubSubRole.SUBSCRIPTION,
+    )
+    assert topic.role == nodl.types.PubSubRole.SUBSCRIPTION
 
 
 def test_representations(topic_publisher):
@@ -52,30 +67,39 @@ def test_representations(topic_publisher):
 
 
 def test_equality(topic_publisher):
-    also_topic_publisher = nodl.types.Topic(name='foo', message_type='bar', publisher=True)
+    also_topic_publisher = nodl.types.Topic(
+        name='foo', message_type='bar', role=nodl.types.PubSubRole.PUBLISHER,
+    )
     assert also_topic_publisher == topic_publisher
 
-    not_same_topic_publisher = nodl.types.Topic(name='fiz', message_type='bar', publisher=True,)
+    not_same_topic_publisher = nodl.types.Topic(
+        name='bar', message_type='bar', role=nodl.types.PubSubRole.PUBLISHER,
+    )
     assert not_same_topic_publisher != topic_publisher
 
     # Test different roles cause inequality
-    assert nodl.types.Action(name='foo', action_type='bar', server=True) != nodl.types.Action(
-        name='foo', action_type='bar', server=True, client=True
-    )
+    assert nodl.types.Action(
+        name='foo', action_type='bar', role=nodl.types.ServerClientRole.CLIENT
+    ) != nodl.types.Action(name='foo', action_type='bar', role=nodl.types.ServerClientRole.BOTH)
 
 
 def test_same_name_different_interface_type():
-    topic = nodl.types.Topic(name='foo', message_type='bar')
-    service = nodl.types.Service(name='foo', service_type='bar')
+    topic = nodl.types.Topic(name='foo', message_type='bar', role=nodl.types.PubSubRole.PUBLISHER,)
+    service = nodl.types.Service(
+        name='foo', service_type='bar', role=nodl.types.ServerClientRole.SERVER
+    )
     assert topic != service
 
 
-def test_node():
-    topic = nodl.types.Topic(name='foo', message_type='bar')
-    service = nodl.types.Service(name='baz', service_type='woo')
+def test_node(topic_publisher):
+    service = nodl.types.Service(
+        name='baz', service_type='woo', role=nodl.types.ServerClientRole.SERVER
+    )
 
-    node = nodl.types.Node(name='test', executable='toast', topics=[topic], services=[service])
+    node = nodl.types.Node(
+        name='test', executable='toast', topics=[topic_publisher], services=[service]
+    )
     assert node.name == 'test'
     assert node.executable == 'toast'
-    assert node.topics[topic.name] == topic
+    assert node.topics[topic_publisher.name] == topic_publisher
     assert node.services[service.name] == service
