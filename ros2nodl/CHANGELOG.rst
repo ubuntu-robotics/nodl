@@ -2,6 +2,12 @@
 Changelog for package ros2nodl
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.3.0 (2020-08-19)
+------------------
+* Add role field, replacing bool pairs
+* Bump ros-tooling action versions
+* Contributors: Ted Kern
+
 0.2.0 (2020-06-29)
 ------------------
 * strip qos from nodl_python (will re-add later)
