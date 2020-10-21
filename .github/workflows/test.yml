@@ -7,7 +7,7 @@ on:
     - cron: '0 0 * * *'
 
 jobs:
-  build-mac-win:
+  build-linux:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -15,7 +15,7 @@ jobs:
         # windows testing is broken, re-add when the following is resolved
         # https://github.com/ros-tooling/action-ros-ci/issues/79
         os:
-          - macos-latest
+          - [ubuntu-18.04]
         ros_distribution:
           - foxy
     steps:
@@ -46,7 +46,7 @@ jobs:
         if: always()
 
   build-docker:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     container:
       image: osrf/ros2:nightly
     steps:
