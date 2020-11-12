@@ -5,7 +5,7 @@
   <version>0.1.0</version>
   <description>Implementation of the NoDL API in Python.</description>
   <maintainer email="ubuntu-robotics@lists.launchpad.net">Ubuntu Robotics</maintainer>
-  <license>LGPLv3</license>
+  <license>Apache License 2.0</license>
 
   <depend>ament_index_python</depend>
   <depend>python3-lxml</depend>

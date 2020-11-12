@@ -1,6 +1,6 @@
 # ros2nodl
 
-![License](https://img.shields.io/badge/license-GPLv3-brightgreen) ![Test NoDL](https://github.com/ubuntu-robotics/nodl/workflows/test%20nodl/badge.svg?event=push)
+![License](https://img.shields.io/badge/License-Apache%202-green) ![Test NoDL](https://github.com/ubuntu-robotics/nodl/workflows/test%20nodl/badge.svg?event=push)
 
 The source code for the NoDL command line tools for ROS 2.
 

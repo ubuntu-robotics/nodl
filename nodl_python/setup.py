@@ -19,12 +19,12 @@ setup(
     keywords=['ROS'],
     classifiers=[
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: GNU Limited General Public License v3',
+        'License :: OSI Approved :: Apache License 2.0',
         'Programming Language :: Python',
         'Topic :: Software Development',
     ],
     description='Implementation of the NoDL API in Python.',
-    license='GNU Limited General Public License v3',
+    license='Apache License 2.0',
     tests_require=['pytest'],
     package_data={'nodl': ['_schemas/*.xsd']},
 )
