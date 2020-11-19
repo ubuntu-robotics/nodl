@@ -2,6 +2,11 @@
 Changelog for package nodl_python
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+0.3.1 (2020-11-21)
+------------------
+* relicense project as Apache 2.0
+* Contributors: Ted Kern
+
 0.3.0 (2020-08-19)
 ------------------
 * Add role field, replacing bool pairs
