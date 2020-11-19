@@ -3,6 +3,8 @@ name: test nodl
 on:
   pull_request:
   push:
+    branches:
+      - master
   schedule:
     - cron: '0 0 * * *'
 
@@ -17,13 +19,14 @@ jobs:
         os:
           - macos-latest
         ros_distribution:
-          - foxy
+          - rolling
     steps:
       - uses: actions/checkout@v2
 
       - name: Setup ROS2
         uses: ros-tooling/setup-ros@0.0.26
         with:
+          use-ros2-testing: true
           required-ros-distributions: ${{ matrix.ros_distribution }}
 
       - name: Extra Dependencies
@@ -31,13 +34,13 @@ jobs:
           pip3 install lxml
 
       - name: Test nodl
-        uses: ros-tooling/action-ros-ci@0.0.19
+        uses: ros-tooling/action-ros-ci@0.1.0
         id: action_ros_ci_step
         with:
           package-name: nodl_python ros2nodl
           colcon-mixin-name: coverage-pytest
           colcon-mixin-repository: https://raw.githubusercontent.com/colcon/colcon-mixin-repository/5c45b95018788deff62202aaa831ad4c20ebe2c6/index.yaml
-          target-ros2-distro: rolling
+          target-ros2-distro: ${{ matrix.ros_distribution }}
 
       - name: Upload Logs
         uses: actions/upload-artifact@v1
@@ -68,7 +71,7 @@ jobs:
       - run: cp src/codecov.yml .
 
       - name: Rosdep
-        run: DEBIAN_FRONTEND=noninteractive rosdep update && rosdep install --from-paths src --ignore-src --rosdistro foxy -y
+        run: DEBIAN_FRONTEND=noninteractive rosdep update && rosdep install --from-paths src --ignore-src --rosdistro rolling -y
 
       - name: Build
         run: . /opt/ros/$ROS_DISTRO/setup.sh && colcon build --event-handlers console_cohesion+ --mixin coverage-pytest --packages-select nodl_python ros2nodl --merge-install
