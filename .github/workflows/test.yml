@@ -72,7 +72,10 @@ jobs:
       - run: cp src/codecov.yml .
 
       - name: Rosdep
-        run: DEBIAN_FRONTEND=noninteractive rosdep update && rosdep install --from-paths src --ignore-src --rosdistro rolling -y
+        run: |
+          apt-get -qq update
+          apt-get -qq upgrade -y
+          DEBIAN_FRONTEND=noninteractive rosdep update && rosdep install --from-paths src --ignore-src --rosdistro rolling -y
 
       - name: Build
         run: . /opt/ros/$ROS_DISTRO/setup.sh && colcon build --event-handlers console_cohesion+ --mixin coverage-pytest --packages-select nodl_python ros2nodl --merge-install
