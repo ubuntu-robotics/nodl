@@ -73,7 +73,7 @@ jobs:
 
       - name: Rosdep
         run: |
-          . /opt/ros/*/setup.sh
+          . /opt/ros/$ROS_DISTRO/setup.sh
           DEBIAN_FRONTEND=noninteractive rosdep update && rosdep install --from-paths src --ignore-src --rosdistro rolling -y
 
       - name: Build
