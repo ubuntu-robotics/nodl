@@ -73,8 +73,7 @@ jobs:
 
       - name: Rosdep
         run: |
-          apt-get -qq update
-          apt-get -qq upgrade -y
+          . /opt/ros/*/setup.sh
           DEBIAN_FRONTEND=noninteractive rosdep update && rosdep install --from-paths src --ignore-src --rosdistro rolling -y
 
       - name: Build
