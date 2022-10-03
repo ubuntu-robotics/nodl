@@ -35,7 +35,7 @@ jobs:
           pip3 install lxml
 
       - name: Test nodl
-        uses: ros-tooling/action-ros-ci@0.1.0
+        uses: ros-tooling/action-ros-ci@v0.2
         id: action_ros_ci_step
         with:
           package-name: nodl_python ros2nodl
