@@ -51,6 +51,7 @@ jobs:
           colcon-mixin-repository: https://raw.githubusercontent.com/colcon/colcon-mixin-repository/5c45b95018788deff62202aaa831ad4c20ebe2c6/index.yaml
           target-ros2-distro: ${{ matrix.ros_distribution }}
           vcs-repo-file-url: "https://raw.githubusercontent.com/ros2/ros2/rolling/ros2.repos"
+          colcon-extra-args: "--merge-install"
 
       - name: Upload Logs
         uses: actions/upload-artifact@v1
