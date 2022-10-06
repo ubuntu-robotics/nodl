@@ -74,9 +74,6 @@ jobs:
           apt-get -qq install -y curl libasio-dev libtinyxml2-dev
           colcon mixin add default https://raw.githubusercontent.com/colcon/colcon-mixin-repository/5c45b95018788deff62202aaa831ad4c20ebe2c6/index.yaml
           colcon mixin update default
-          # Use the apt ones and not the pip one with unsupported version from ament_flake8
-          # https://github.com/osrf/docker_images/issues/640
-          pip3 uninstall -y flake8 pycodestyle
           mkdir -p src
 
       - name: Checkout
