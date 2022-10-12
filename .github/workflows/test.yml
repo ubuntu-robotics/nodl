@@ -7,6 +7,7 @@ on:
       - master
   schedule:
     - cron: '0 0 * * *'
+  workflow_dispatch:
 
 jobs:
   build-mac-win:
@@ -24,7 +25,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - name: Setup ROS2
-        uses: ros-tooling/setup-ros@0.0.26
+        uses: ros-tooling/setup-ros@v0.4
         with:
           use-ros2-testing: true
           required-ros-distributions: ${{ matrix.ros_distribution }}
@@ -34,13 +35,25 @@ jobs:
           pip3 install lxml
 
       - name: Test nodl
-        uses: ros-tooling/action-ros-ci@0.1.0
+        uses: ros-tooling/action-ros-ci@v0.2
         id: action_ros_ci_step
         with:
           package-name: nodl_python ros2nodl
-          colcon-mixin-name: coverage-pytest
+          colcon-defaults: |
+            {
+              "build": {
+                "mixin": ["coverage-pytest"]
+              },
+              "test": {
+                "mixin": ["coverage-pytest"]
+              }
+            }
           colcon-mixin-repository: https://raw.githubusercontent.com/colcon/colcon-mixin-repository/5c45b95018788deff62202aaa831ad4c20ebe2c6/index.yaml
           target-ros2-distro: ${{ matrix.ros_distribution }}
+          vcs-repo-file-url: "https://raw.githubusercontent.com/ros2/ros2/rolling/ros2.repos"
+          # Necessary because of cyclonedds fails to build otherwise
+          # https://github.com/eclipse-cyclonedds/cyclonedds/issues/1270
+          colcon-extra-args: "--merge-install"
 
       - name: Upload Logs
         uses: actions/upload-artifact@v1
@@ -71,7 +84,9 @@ jobs:
       - run: cp src/codecov.yml .
 
       - name: Rosdep
-        run: DEBIAN_FRONTEND=noninteractive rosdep update && rosdep install --from-paths src --ignore-src --rosdistro rolling -y
+        run: |
+          . /opt/ros/$ROS_DISTRO/setup.sh
+          DEBIAN_FRONTEND=noninteractive rosdep update && rosdep install --from-paths src --ignore-src --rosdistro $ROS_DISTRO -y
 
       - name: Build
         run: . /opt/ros/$ROS_DISTRO/setup.sh && colcon build --event-handlers console_cohesion+ --mixin coverage-pytest --packages-select nodl_python ros2nodl --merge-install
@@ -100,3 +115,4 @@ jobs:
           name: colcon-logs-linux
           path: log/
         if: always()
+
