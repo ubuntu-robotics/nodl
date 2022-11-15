@@ -23,7 +23,8 @@ jobs:
           - rolling
     steps:
       - uses: actions/checkout@v2
-
+      - name: Add Python bin to PATH
+        run: echo "/Library/Frameworks/Python.framework/Versions/Current/bin" >> $GITHUB_PATH
       - name: Setup ROS2
         uses: ros-tooling/setup-ros@v0.4
         with:
