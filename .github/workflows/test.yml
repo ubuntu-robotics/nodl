@@ -10,58 +10,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-mac-win:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: false
-      matrix:
-        # windows testing is broken, re-add when the following is resolved
-        # https://github.com/ros-tooling/action-ros-ci/issues/79
-        os:
-          - macos-latest
-        ros_distribution:
-          - rolling
-    steps:
-      - uses: actions/checkout@v2
-
-      - name: Setup ROS2
-        uses: ros-tooling/setup-ros@v0.4
-        with:
-          use-ros2-testing: true
-          required-ros-distributions: ${{ matrix.ros_distribution }}
-
-      - name: Extra Dependencies
-        run: |
-          pip3 install lxml
-
-      - name: Test nodl
-        uses: ros-tooling/action-ros-ci@v0.2
-        id: action_ros_ci_step
-        with:
-          package-name: nodl_python ros2nodl
-          colcon-defaults: |
-            {
-              "build": {
-                "mixin": ["coverage-pytest"]
-              },
-              "test": {
-                "mixin": ["coverage-pytest"]
-              }
-            }
-          colcon-mixin-repository: https://raw.githubusercontent.com/colcon/colcon-mixin-repository/5c45b95018788deff62202aaa831ad4c20ebe2c6/index.yaml
-          target-ros2-distro: ${{ matrix.ros_distribution }}
-          vcs-repo-file-url: "https://raw.githubusercontent.com/ros2/ros2/rolling/ros2.repos"
-          # Necessary because of cyclonedds fails to build otherwise
-          # https://github.com/eclipse-cyclonedds/cyclonedds/issues/1270
-          colcon-extra-args: "--merge-install"
-
-      - name: Upload Logs
-        uses: actions/upload-artifact@v1
-        with:
-          name: colcon-logs-macwin
-          path: ${{ steps.action_ros_ci_step.outputs.ros-workspace-directory-name }}/log
-        if: always()
-
   build-docker:
     runs-on: ubuntu-latest
     container:
